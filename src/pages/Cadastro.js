@@ -6,6 +6,10 @@ import React from 'react'
 import axios from 'axios';
 import { useNavigate, } from "react-router-dom";
 import { ThreeDots } from 'react-loader-spinner';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 
 export default function Cadastro(){
@@ -34,9 +38,7 @@ export default function Cadastro(){
 
             }
 
-        let promise = axios.post(
-        "https://projeto17-linkr-back-0.herokuapp.com/signup"
-        ,body)
+        let promise = axios.post(`${REACT_APP_API_URL}/signup`,body)
         promise.then((response => {    
             console.log(response)
             navigate("/")
