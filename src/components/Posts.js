@@ -64,7 +64,7 @@ export default function Posts(){
 
         } else {
 
-            const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} links={post.links} hashtags={post.hashtags} />);
+            const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} links={post.links} likes={post.likes} hashtags={post.hashtags} />);
             return postsList;
 
         }
