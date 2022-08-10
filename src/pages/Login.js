@@ -5,15 +5,15 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
 import { ThreeDots } from 'react-loader-spinner';
-import imglogo from "../assets/imglogo.png"
+
 
 export default function Login(){
     const [email, setEmail] = useState("");
 	const [senha, setSenha] = useState("");
     const [disabled, setDisabled] = useState(false)
     const {setToken} = useContext(TokenContext)
-    const [botao, setBotao] = useState("Entrar")
-    const [colorButton, setColorButton] = useState("#003f88");
+    const [botao, setBotao] = useState("Log in")
+    const [colorButton, setColorButton] = useState("#1877F2");
     const [colorInput, setColorInput] = useState("black");
     const navigate = useNavigate();
     
@@ -21,7 +21,7 @@ export default function Login(){
     function fazerLogin(event) {
         event.preventDefault()
         setDisabled(true)
-        setColorButton("#4a759e")
+        setColorButton("#5d99e2")
         setColorInput("#AFAFAF")
         setBotao(<ThreeDots color="white" height={80} width={80} />)
         let body = {
@@ -29,18 +29,18 @@ export default function Login(){
             password:senha
         }
         console.log(body)
-        let promise = axios.post("https://hardstore0.herokuapp.com/sign-in", body)
+        let promise = axios.post("https://projeto17-linkr-back-0.herokuapp.com/signin", body)
         promise.then((response => {
             setToken(response.data)
             console.log("token", response.data)
-            navigate("/produtos")  
+            navigate("/home")  
           }))
           promise.catch((response => {
           alert(`Falha no login.Verifique seu usario e senha ${response}`)
-          setColorButton("#003f88")
+          setColorButton("#1877F2")
           setColorInput("black")
           setDisabled(false)
-          setBotao("Login")
+          setBotao("Log in")
           }
           ))
         
@@ -51,25 +51,98 @@ export default function Login(){
         
         <Container disabled={disabled} colorInput= {colorInput} colorButton={colorButton}>
         <Logo>
-        <img src={imglogo} alt="logo"/>
-        <h1>HardStore</h1>
+        <h1>linkr</h1>
+        <h2>save, share and discover</h2>
+        <h2>the best links on the web</h2>
         </Logo>
         <Form >
         <form onSubmit={fazerLogin}>
-            <input  disabled ={disabled} placeholder = "Email" type= "email" value={email} onChange={e => setEmail(e.target.value)} />
-            <input disabled ={disabled} placeholder = "Senha" type="password"value={senha} onChange={e => setSenha(e.target.value)}/>
+            <input  disabled ={disabled} placeholder = "e-mail" type= "email" value={email} onChange={e => setEmail(e.target.value)} />
+            <input disabled ={disabled} placeholder = "password" type="password"value={senha} onChange={e => setSenha(e.target.value)}/>
             <button disabled = {disabled} type="submit">{botao}</button>
         </form>
-        </Form>
         <Link to = "/cadastro">
-        <h2>Não tem conta? Cadastre-se! </h2>
+        <h3>Frist time? Create an account! </h3>
         </Link>
+        </Form>
+        
         </Container>
         
     )
 }
 
 export const Container = styled.div`
+box-sizing: border-box;
+display: flex;
+align-items: center;
+justify-content: flex-start;
+font-family: 'Raleway', sans-serif;
+font-size: 20px;
+height: 100vh;
+width: 100vw;
+padding-bottom: 50px;
+position: relative;
+button{
+display: flex;
+align-items: center;
+justify-content: center;
+height: 45px;
+width: 25vw;
+margin-left: 7vw;
+border-radius: 5px;
+color: white;
+font-weight: 600;
+background-color: ${props => props.colorButton} ;
+border: none;
+font-family: 'Oswald', sans-serif;
+font-size: 20px;
+}
+img{
+    height: auto;
+    width: 200px;
+}
+input{
+height: 45px;
+border-radius: 5px;
+margin-bottom: 10px;
+margin-left: 7vw;
+width: 25vw;
+color : ${props => props.colorInput };
+border: 1px solid #D4D4D4;
+font-size: 20px;
+background-color: #ffffff;
+::placeholder{
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #9F9F9F;
+}
+}
+
+h1{
+    font-family: 'Passion One', cursive;
+    font-size: 105px;
+    color: #ffffff;
+   
+}
+h2{
+    font-family: 'Oswald', sans-serif;
+    font-size: 45px;
+    color: #ffffff;
+    
+}
+h3{
+    font-family: 'Lato', sans-serif;
+    font-size: 17px;
+    color: #ffffff;
+    text-decoration: underline;
+    margin-top: 20px;
+    margin-left: 7vw;
+
+    
+}
+@media only screen and (max-width: 640px) {
+    
 box-sizing: border-box;
 display: flex;
 flex-direction: column;
@@ -86,13 +159,14 @@ display: flex;
 align-items: center;
 justify-content: center;
 height: 45px;
-width: 85vw;
+width: 86vw;
 border-radius: 5px;
+margin-left: 7vw;
 color: white;
-font-weight: bold;
+font-weight: 600;
 background-color: ${props => props.colorButton} ;
 border: none;
-font-family: 'Raleway', sans-serif;
+font-family: 'Oswald', sans-serif;
 font-size: 20px;
 }
 img{
@@ -103,54 +177,82 @@ input{
 height: 45px;
 border-radius: 5px;
 margin-bottom: 10px;
+margin-left: 7vw;
 width: 85vw;
 color : ${props => props.colorInput };
 border: 1px solid #D4D4D4;
 font-size: 20px;
 background-color: #ffffff;
 ::placeholder{
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Oswald', sans-serif;
     font-size: 20px;
-    color: black;
+    font-weight: 600;
+    color: #9F9F9F;
 }
 }
 
 h1{
-    font-family: 'Secular One', sans-serif;
-    font-size: 40px;
-    color: #003f88;
-    margin-bottom: 30px;
+    font-family: 'Passion One', cursive;
+    font-size: 75px;
+    color: #ffffff;
+   
 }
-h2, h3, h4{
-    font-family: 'Raleway', sans-serif;
-    font-size: 16px;
-    color: #003f88;
-    margin-top: 30px;
-    text-decoration: underline;
+h2{
+    font-family: 'Oswald', sans-serif;
+    font-size: 25px;
+    color: #ffffff;
+    
 }
 h3{
-    font-size: 25px;
-    margin-top: 5px;
-    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 17px;
+    color: #ffffff;
+    text-decoration: underline;
+    margin-top: 20px;
+    margin-right: 5vw;
 }
-h4{
-    font-size: 20px;
-    margin-bottom: 20px;
-    text-decoration: none;
 }
 ` 
 export const Form = styled.div`
-margin-left: 7vw;
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 30vw;
+
+@media only screen and (max-width: 640px){
+width: auto;
+
+
+}
 `
 export const Logo = styled.div`
+
 display: flex;
-justify-content: space-around;
-align-items: flex-end;
-width: 80vw;
-height: 100px;
-img{
-    width:100px;
-    height:100px;
-    margin-bottom: 40px;
+flex-direction: column;
+justify-content:center;
+text-align: left;
+align-items: flex-start;
+width: 60vw;
+height: 110vh;
+background-color: #151515;
+box-sizing: border-box;
+padding: 5vw;
+
+@media only screen and (max-width: 640px){
+display: flex;
+flex-direction: column;
+justify-content:space-around;
+align-items: center;
+width: 100vw;
+height: 25vh;
+background-color: #151515;
+position: fixed;
+left: 0;
+top: 0;
+box-sizing: border-box;
+padding: 15px;
+
 }
+
+;
 `
