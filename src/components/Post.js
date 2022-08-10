@@ -1,5 +1,7 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import formatLikes from "../utils/formatLikes";
 
 const PostDiv = styled.div`
     
@@ -27,6 +29,7 @@ const PostDiv = styled.div`
 
     .left-side > span {
         margin-top: 15px;
+        font-size: 34px;
     }
 
     .left-side > p {
@@ -59,15 +62,17 @@ const PostDiv = styled.div`
     }
 `;
 
-export default function Post({ authorPic, authorUsename, postContent, links, hashtags }){
+export default function Post({ authorPic, authorUsename, postContent, links, likes, hashtags }){
 
     return(
         <PostDiv>
 
             <div className="left-side">
                 <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
-                <span>Icon</span>
-                <p>25k Likes</p>
+                <span>
+                    <AiOutlineHeart />
+                </span>
+                <p>{formatLikes(likes)} Likes</p>
             </div>
 
             <div className="post-info">
