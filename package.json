@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-loading": "^2.0.3",
     "react-icons": "^4.4.0",
     "react-loader-spinner": "^5.1.7-beta.1",
     "react-onclickoutside": "^6.12.2",
@@ -35,5 +37,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "axios": "^0.27.2"
   }
 }
