@@ -11,6 +11,7 @@ const TimelineSection = styled.section`
     width: 80%;
     margin: 0 auto;
     margin-top: 140px;
+    justify-content: center;
 
 `;
 

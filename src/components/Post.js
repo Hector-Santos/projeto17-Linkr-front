@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import PostLink from "./PostLink";
 
 const PostDiv = styled.div`
     
@@ -56,77 +57,26 @@ const PostDiv = styled.div`
         display: flex;
         flex-direction: column;
     }
-
-    .post-info .links .link {
-        border-radius: 11px;
-        border: solid 1px #4d4d4d;
-        display: flex;
-        justify-content: space-around;
-    }
-
-    .post-info .links .link .metadata {
-        padding: 20px;
-        align-self: center;
-    }
-
-    .post-info .links .link .metadata h4,
-    .post-info .links .link .metadata a {
-        color: #cecece;
-        margin-bottom: 5px;
-        text-decoration: none;
-    }
-
-    .post-info .links .link .metadata h4 {
-        font-size: 15px;
-        cursor: pointer;
-        margin-bottom: 10px;
-    }
-
-    .post-info .links .link .metadata a,
-    .post-info .links .link .metadata p {
-        font-size: 13px;
-    }
-
-    .post-info .links .link .metadata p {
-        color: #9B9595;
-        margin-bottom: 20px;
-    }
-
-    .post-info .links .link img {
-        height: 180px;
-        width: 40%;
-        border-radius: 0 10px 10px 0;
-        cursor: pointer;
-        object-fit: cover;
-    }
 `;
 
-export default function Post(){
+export default function Post({ authorPic, authorUsename, postContent, links, hashtags }){
 
     return(
         <PostDiv>
 
             <div className="left-side">
-                <img src="https://lh3.googleusercontent.com/ogw/AOh-ky1uDVppF3sSrOm6f55jVSFu569TKb9eMJz4kWWY4Q=s32-c-mo" alt="Imagem de perfil do usuário que publicou" />
+                <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
                 <span>Icon</span>
                 <p>25k Likes</p>
             </div>
 
             <div className="post-info">
 
-                <h3>Usuário</h3>
-
-                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Earum molestiae vero doloremque neque et aliquid? Laudantium voluptas in harum. Necessitatibus, dignissimos veritatis. Commodi dolor magnam, adipisci iure minima veniam praesentium.</p>
+                <h3>{authorUsename}</h3>
+                <p>{postContent}</p>
 
                 <div className="links">
-                    <div className="link">
-                        <div className="metadata">
-                            <h4>TESTE</h4>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur eveniet inventore nulla, reiciendis provident placeat odio commodi, soluta voluptate alias, eos nemo qui? Nisi iure cum quisquam doloremque reiciendis maiores.</p>
-                            <a href="#">LINK AQUI</a>
-                        </div>
-                        <img src="https://blog.soaresdev.com/assets/img/nodejs/nodejs-api-rest.png" alt="Imagem da postagem" />
-                    </div>
+                    {links.map(link => <PostLink linkUrl={link.url} linkId={link.id} />)}
                 </div>
 
             </div>

@@ -6,7 +6,7 @@ const TrendingDiv = styled.div`
     margin-left: 20px;
     background-color: #171717;
     border-radius: 16px;
-    width: 50%;
+    width: 30%;
     padding: 20px;
     height: fit-content;
     
