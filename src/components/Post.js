@@ -2,6 +2,8 @@ import styled from "styled-components";
 import PostLink from "./PostLink";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import formatLikes from "../utils/formatLikes";
+import { ReactTagify } from "react-tagify";
+import { useNavigate } from "react-router-dom";
 
 const PostDiv = styled.div`
     
@@ -64,6 +66,31 @@ const PostDiv = styled.div`
 
 export default function Post({ authorPic, authorUsename, postContent, links, likes, hashtags }){
 
+    const navigate = useNavigate();
+
+    function goToHashtag(hashtagName){
+
+        navigate(`/hashtag/${hashtagName.replace(/#/gi, "")}`);
+
+    }
+
+    function formatPostContent(){
+
+        return(
+            <p>
+                {postContent}
+                <ReactTagify 
+                    colors={"white"}
+                    tagClicked={goToHashtag}>
+                    <span>
+                        {hashtags.join(' ')}
+                    </span>
+                </ReactTagify>
+            </p>
+        );
+
+    }
+
     return(
         <PostDiv>
 
@@ -78,7 +105,7 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
             <div className="post-info">
 
                 <h3>{authorUsename}</h3>
-                <p>{postContent}</p>
+                {formatPostContent()}
 
                 <div className="links">
                     {links.map(link => <PostLink linkUrl={link.url} linkId={link.id} />)}
