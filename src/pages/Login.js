@@ -5,6 +5,9 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
 import { ThreeDots } from 'react-loader-spinner';
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 
 export default function Login(){
@@ -16,8 +19,8 @@ export default function Login(){
     const [colorButton, setColorButton] = useState("#1877F2");
     const [colorInput, setColorInput] = useState("black");
     const navigate = useNavigate();
-    
-   
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+ 
     function fazerLogin(event) {
         event.preventDefault()
         setDisabled(true)
@@ -29,14 +32,20 @@ export default function Login(){
             password:senha
         }
         console.log(body)
-        let promise = axios.post("https://projeto17-linkr-back-0.herokuapp.com/signin", body)
+       let promise = axios.post(`${REACT_APP_API_URL}/signin `, body)
         promise.then((response => {
             setToken(response.data)
             console.log("token", response.data)
-            navigate("/home")  
+            navigate("/timeline")  
           }))
-          promise.catch((response => {
-          alert(`Falha no login.Verifique seu usario e senha ${response}`)
+          promise.catch((error => {
+            if(error.response.status === 401){
+                alert(`Usuario ou senha incorretos`)
+                }else if(error.response.status === 422){
+                alert(`Preencha todos os campos`)
+                }else{
+                    alert("erro")
+                }
           setColorButton("#1877F2")
           setColorInput("black")
           setDisabled(false)
