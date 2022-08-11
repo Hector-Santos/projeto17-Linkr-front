@@ -12,6 +12,7 @@ const LinkDiv = styled.div`
     border: solid 1px #4d4d4d;
     display: flex;
     justify-content: space-around;
+    margin-bottom: 10px;
     
     .metadata {
         padding: 20px;
@@ -78,7 +79,7 @@ export default function PostLink({ linkUrl, linkId }){
                 <h4>{metadata.title}</h4>
                 <p>{metadata.description}</p>
                 <a href={linkUrl} target="_blank" rel="noreferrer noopener">
-                    {linkUrl}
+                    {metadata.ogUrl ? metadata.ogUrl : linkUrl}
                 </a>
             </div>
             <img src={metadata.image} alt="Imagem da postagem" />
