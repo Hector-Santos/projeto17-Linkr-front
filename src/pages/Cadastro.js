@@ -9,19 +9,17 @@ import { ThreeDots } from 'react-loader-spinner';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-
-
 export default function Cadastro(){
     const [email, setEmail] = useState("");
-	const [senha, setSenha] = useState("");
+	const [password, setPassword] = useState("");
     const [userName, setUserName] = useState("");
     const [pictureUrl, setPictureUrl] = useState("")
     const [disabled, setDisabled] = useState(false)
-    const [botao, setBotao] = useState("Cadastrar")
+    const [botao, setBotao] = useState("Sign Up")
     const [colorButton, setColorButton] = useState("#003f88");
     const [colorInput, setColorInput] = useState("black");
     const navigate = useNavigate();
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
     function fazerCadastro(event) {
         event.preventDefault()
@@ -32,25 +30,32 @@ export default function Cadastro(){
         let body = 
             {
                 email: email,
-                password: senha,
+                password: password,
                 userName: userName,
                 pictureUrl: pictureUrl
 
             }
 
-        let promise = axios.post(`${REACT_APP_API_URL}/signup`,body)
+        let promise = axios.post(`${REACT_APP_API_URL}/signup `, body)
         promise.then((response => {    
             console.log(response)
             navigate("/")
           }))
-        
-          promise.catch((response => {
-            alert(`Algo de errado não está certo
-  ${response}`)
+          promise.catch((error => {
+            if(error.response.data === "Conflict"){
+                alert(`Email inválido. Um usuário com este email já existe`)
+                }else if(error.response.status === 422){
+                alert(`Preencha todos os campos`)
+                }else if(error.response.data.code === "23505"){
+                alert(`UserName indisponível. Um usuário com este UserName já existe`)
+                }else{
+                    alert("erro")
+                }
+
             setColorButton("#003f88")
             setColorInput("black")
             setDisabled(false)
-            setBotao("Login")
+            setBotao("Sign Up")
             }
             ))
           
@@ -67,7 +72,7 @@ export default function Cadastro(){
         <Form>
         <form onSubmit={fazerCadastro}>
             <input disabled={disabled} placeholder = "e-mail" type= "email" value={email} onChange={e => setEmail(e.target.value)} />
-            <input disabled={disabled} placeholder = "password" type="password"value={senha} onChange={e => setSenha(e.target.value)}/>
+            <input disabled={disabled} placeholder = "password" type="password"value={password} onChange={e => setPassword(e.target.value)}/>
             <input disabled={disabled} placeholder = "userName" type="text"value={userName} onChange={e => setUserName(e.target.value)}/>
             <input disabled={disabled} placeholder = "picture url" type="url" value={pictureUrl} onChange={e => setPictureUrl(e.target.value)}/>
             <button type="submit">{botao}</button>
