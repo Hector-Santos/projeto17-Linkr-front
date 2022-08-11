@@ -8,12 +8,6 @@ import { useNavigate, } from "react-router-dom";
 import { ThreeDots } from 'react-loader-spinner';
 import dotenv from 'dotenv';
 dotenv.config();
-<<<<<<< HEAD
-=======
-
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-
->>>>>>> 13b4b3b3afc6422ac8de153868c3762161e9f22d
 
 export default function Cadastro(){
     const [email, setEmail] = useState("");
