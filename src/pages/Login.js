@@ -32,7 +32,11 @@ export default function Login(){
             password:senha
         }
         console.log(body)
+<<<<<<< HEAD
        let promise = axios.post(`${REACT_APP_API_URL}/signin `, body)
+=======
+        let promise = axios.post(`${REACT_APP_API_URL}/signin`, body)
+>>>>>>> 13b4b3b3afc6422ac8de153868c3762161e9f22d
         promise.then((response => {
             setToken(response.data)
             console.log("token", response.data)

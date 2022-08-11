@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import Logout from './Logout';
+import SearchBar from './SearchBar';
 
 const HeaderEl = styled.header`
     
@@ -29,6 +30,7 @@ export default function Header(){
         <>
             <HeaderEl>
                 <h1>Linkr</h1>
+                <SearchBar />
                 <Logout />
             </HeaderEl>
         </>
