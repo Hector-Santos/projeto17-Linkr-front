@@ -1,7 +1,11 @@
-export default function TrendingHashtag(){
+import { Link } from "react-router-dom";
+
+export default function TrendingHashtag({ name }){
 
     return(
-        <a href="#"># Teste</a>
+        <Link to={`/hashtag/${name.replace(/#/gi, "")}`}>
+            #{name}
+        </Link>
     );
 
 };

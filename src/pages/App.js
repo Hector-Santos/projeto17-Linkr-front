@@ -5,6 +5,7 @@ import Home from "./Home.js";
 import Login from "./Login.js"
 import Cadastro from "./Cadastro.js";
 import Timeline from "../components/Timeline.js";
+import HashtagPostsPage from "../components/HashtagPostsPage.js";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/hashtag/:hashtagName" element={<HashtagPostsPage />} />
           <Route path="/timeline" element={<Timeline />} />
         </Routes>
       </TokenProvider>

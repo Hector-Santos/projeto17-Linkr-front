@@ -6,10 +6,11 @@ import TrendingSidebar from "./TrendingSidebar";
 import { useEffect,useContext } from "react";
 import { TokenContext } from '../context/TokenContext';
 import { useNavigate } from "react-router-dom";
+import Login from "../pages/Login";
+import PageTitle from "./PageTitle";
 
 
-
-const TimelineSection = styled.section`
+const Wrapper = styled.section`
     
     display: flex;
     border-radius: 16px;
@@ -22,6 +23,9 @@ const TimelineSection = styled.section`
     div{
         display: flex;
         flex-direction: column;
+    }
+    @media only screen and (max-width: 640px) {
+        width: 95%;
     }
 
 `;
@@ -47,12 +51,20 @@ export default function Timeline(){
         })()});
 
     return (
-        <TimelineSection>
+        <>
+            <Header />
+            <Wrapper>
             <div>
             <NewPost/>
             <Posts />
             </div>
-             <TrendingSidebar />
-        </TimelineSection>
+                <TrendingSidebar />
+            </Wrapper>
+        </>
+
     )
+};
+
+export {
+    Wrapper
 };
