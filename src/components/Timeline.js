@@ -2,8 +2,12 @@ import Header from "./Header";
 import styled from "styled-components";
 import Posts from "./Posts";
 import TrendingSidebar from "./TrendingSidebar";
+import { useContext } from "react";
+import { TokenContext } from '../context/TokenContext';
+import Login from "../pages/Login";
+import PageTitle from "./PageTitle";
 
-const TimelineSection = styled.section`
+const Wrapper = styled.section`
     
     display: flex;
     border-radius: 16px;
@@ -13,14 +17,28 @@ const TimelineSection = styled.section`
     margin-top: 140px;
     justify-content: center;
 
+    @media only screen and (max-width: 640px) {
+        width: 95%;
+    }
+
 `;
 
 export default function Timeline(){
 
+    const { token } = useContext(TokenContext);
+    if(!token) return <Login />;
+
     return (
-        <TimelineSection>
-            <Posts />
-            <TrendingSidebar />
-        </TimelineSection>
+        <>
+            <Header />
+            <Wrapper>
+                <Posts />
+                <TrendingSidebar />
+            </Wrapper>
+        </>
     )
+};
+
+export {
+    Wrapper
 };

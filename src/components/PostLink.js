@@ -49,6 +49,43 @@ const LinkDiv = styled.div`
         cursor: pointer;
         object-fit: cover;
     }
+
+    @media only screen and (max-width: 640px) {
+
+        .metadata {
+            padding: 6px;
+            align-self: center;
+        }
+    
+        .metadata h4,
+        .metadata a {
+            margin-bottom: 5px;
+        }
+    
+        .metadata h4 {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+    
+        .metadata a,
+        .metadata p {
+            font-size: 10px;
+        }
+    
+        .metadata p {
+            margin-bottom: 15px;
+        }
+    
+        img {
+            height: 100%;
+            width: 30%;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            object-fit: cover;
+        }
+
+    }
+
 `;
 
 export default function PostLink({ linkUrl, postId }){
