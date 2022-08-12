@@ -1,9 +1,10 @@
-import styled from "styled-components";
-import { AiOutlineDown } from "react-icons/ai";
 import { useContext, useEffect, useState } from "react";
+import { AiOutlineDown } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import dotenv from 'dotenv';
 import onClickOutside from "react-onclickoutside";
+import styled from "styled-components";
 
 import { TokenContext } from '../context/TokenContext';
 
@@ -13,8 +14,9 @@ function Logout () {
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
     const [showMenu, setShowMenu] = useState(false);
-    const [profilePic, setProfilePic] = useState()
-    const { header } = useContext(TokenContext)
+    const [profilePic, setProfilePic] = useState();
+    let { header } = useContext(TokenContext);
+    const navigate = useNavigate();
 
     useEffect(()=>{
         ( async ()=>{
@@ -22,6 +24,12 @@ function Logout () {
            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
            setProfilePic(user.data.pictureUrl)
         })()});
+
+    function clearUser () {
+        header = "";
+        localStorage.clear();
+        navigate("/");
+    }
     
     const toggle = () => {
         if (showMenu === false) {
@@ -51,6 +59,14 @@ function Logout () {
         )
     }
 
+    const Menu = () => {
+        return (
+            <LogoutContainer>
+                <h2 onClick={clearUser}>Logout</h2>
+            </LogoutContainer>
+        )
+    }
+
     return (
         <Container>
             { showMenu ? <IconDown /> : <IconUp /> }
@@ -64,13 +80,7 @@ const clickOutsideConfig = {
     handleClickOutside: () => Logout.handleClickOutside,
 };
 
-const Menu = () => {
-    return (
-        <LogoutContainer>
-            <h2>Logout</h2>
-        </LogoutContainer>
-    )
-}
+
 
 const Container =styled.div`
 background: #151515;
