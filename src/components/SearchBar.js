@@ -1,8 +1,30 @@
+import { useEffect, useState } from "react";
 import { DebounceInput } from "react-debounce-input";
 import { AiOutlineSearch } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import styled from "styled-components";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 function SearchBar () {
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
+    let search = "";
+    const [searchList, setSearchList] = useState([]);
+
+    async function handleSearch (search) {
+        try {
+            const { data } = await axios.get(`${REACT_APP_API_URL}/search/${search}`);
+            
+            setSearchList(data);
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <SearchContainer>
             <SearchInput>
@@ -10,7 +32,7 @@ function SearchBar () {
                     minLength = {3}
                     debounceTimeout = {300}
                     onChange={e => {
-                        console.log(e.target.value);
+                        handleSearch(e.target.value);
                     }}
                     placeholder = "Search for people"
                     className = "searchBar-input"
@@ -24,6 +46,7 @@ function SearchBar () {
 
 const SearchContainer = styled.div`
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     
