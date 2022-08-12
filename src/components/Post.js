@@ -64,7 +64,7 @@ const PostDiv = styled.div`
     }
 `;
 
-export default function Post({ authorPic, authorUsename, postContent, links, likes, hashtags }){
+export default function Post({ authorPic, authorUsename, postContent, link, likes, hashtags, postId }){
 
     const navigate = useNavigate();
 
@@ -76,6 +76,8 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
 
     function formatPostContent(){
 
+        const formattedHashtags = [...hashtags].map(hashtag => `#${hashtag}`);
+
         return(
             <p>
                 {postContent}
@@ -83,7 +85,7 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
                     colors={"white"}
                     tagClicked={goToHashtag}>
                     <span>
-                        {hashtags.join(' ')}
+                        {formattedHashtags.join(' ')}
                     </span>
                 </ReactTagify>
             </p>
@@ -108,7 +110,7 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
                 {formatPostContent()}
 
                 <div className="links">
-                    {links.map(link => <PostLink linkUrl={link.url} linkId={link.id} />)}
+                    <PostLink linkUrl={link} postId={postId} />
                 </div>
 
             </div>

@@ -15,6 +15,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/hashtag/:hashtagName" element={<Home />} />
           <Route path="/timeline" element={<Timeline />} />
         </Routes>
       </TokenProvider>

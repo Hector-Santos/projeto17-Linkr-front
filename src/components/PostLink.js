@@ -51,7 +51,7 @@ const LinkDiv = styled.div`
     }
 `;
 
-export default function PostLink({ linkUrl, linkId }){
+export default function PostLink({ linkUrl, postId }){
 
     const [metadata, setMetadata] = useState({});
 
@@ -61,7 +61,7 @@ export default function PostLink({ linkUrl, linkId }){
 
             try {
                 
-                const { data } = await axios.get(`${REACT_APP_API_URL}/get-url-metadata/${linkId}`);
+                const { data } = await axios.get(`${REACT_APP_API_URL}/get-url-metadata/${postId}`);
                 setMetadata({...data});
 
             } catch (err) {

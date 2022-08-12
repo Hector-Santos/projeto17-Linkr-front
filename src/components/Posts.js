@@ -4,6 +4,7 @@ import Post from "./Post";
 import dotenv from 'dotenv';
 import styled from "styled-components";
 import ReactLoading from 'react-loading';
+import { useParams } from "react-router-dom";
 
 dotenv.config();
 
@@ -33,7 +34,6 @@ export default function Posts(){
             try {
                 
                 const { data } = await axios.get(`${REACT_APP_API_URL}/timeline`);
-                console.log('posts ', data);
                 setPosts(data);
                 setLoading(false);
 
@@ -64,7 +64,7 @@ export default function Posts(){
 
         } else {
 
-            const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} links={post.links} likes={post.likes} hashtags={post.hashtags} />);
+            const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} />);
             return postsList;
 
         }

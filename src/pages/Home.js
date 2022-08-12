@@ -7,7 +7,7 @@ export default function Home(){
         <>
             <Header />
             <main>
-                <Timeline/>
+                <Timeline />
             </main>
         </>
     );
