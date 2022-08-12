@@ -124,7 +124,7 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
 
     function formatPostContent(){
 
-        const formattedHashtags = [...hashtags].map(hashtag => `#${hashtag}`);
+        const formattedHashtags = [...hashtags].filter(hashtag => hashtag !== '').map(hashtag => `#${hashtag}`);
 
         return(
             <p>
