@@ -1,11 +1,14 @@
 import Header from "./Header";
 import styled from "styled-components";
 import Posts from "./Posts";
+import NewPost from "./NewPost.js";
 import TrendingSidebar from "./TrendingSidebar";
-import { useContext } from "react";
+import { useEffect,useContext } from "react";
 import { TokenContext } from '../context/TokenContext';
+import { useNavigate } from "react-router-dom";
 import Login from "../pages/Login";
 import PageTitle from "./PageTitle";
+
 
 const Wrapper = styled.section`
     
@@ -17,6 +20,10 @@ const Wrapper = styled.section`
     margin-top: 140px;
     justify-content: center;
 
+    div{
+        display: flex;
+        flex-direction: column;
+    }
     @media only screen and (max-width: 640px) {
         width: 95%;
     }
@@ -24,18 +31,37 @@ const Wrapper = styled.section`
 `;
 
 export default function Timeline(){
-
-    const { token } = useContext(TokenContext);
-    if(!token) return <Login />;
+    
+    const {token, setToken} = useContext(TokenContext)
+    const navigate = useNavigate();
+    useEffect(()=>{
+        ( ()=>{
+            console.log("useeffect")
+                const localStorageToken = window.localStorage.getItem('token')
+                if(localStorageToken && !token){
+                    console.log("1")
+                   setToken(localStorageToken)
+                }else if(!localStorageToken && !token){
+                    console.log("2")
+                 navigate("/")
+                }else if(!localStorageToken && token){
+                    console.log("3")
+                    window.localStorage.setItem('token', token)
+                }
+        })()});
 
     return (
         <>
             <Header />
             <Wrapper>
-                <Posts />
+            <div>
+            <NewPost/>
+            <Posts />
+            </div>
                 <TrendingSidebar />
             </Wrapper>
         </>
+
     )
 };
 

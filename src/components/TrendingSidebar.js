@@ -36,12 +36,6 @@ const TrendingDiv = styled.div`
         color: #fff;
     }
 
-    @media only screen and (max-width: 640px) {
-
-        display: none;
-
-    }
-
 `;
 
 export default function TrendingSidebar(){
