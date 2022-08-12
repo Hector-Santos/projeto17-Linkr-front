@@ -13,7 +13,7 @@ const TrendingDiv = styled.div`
     margin-left: 20px;
     background-color: #171717;
     border-radius: 16px;
-    width: 30%;
+    width: 65%;
     padding: 20px;
     height: fit-content;
     
@@ -34,6 +34,10 @@ const TrendingDiv = styled.div`
         text-decoration: none;
         display: block;
         color: #fff;
+    }
+
+    @media only screen and (max-width: 640px) {
+        display: none;
     }
 
 `;
