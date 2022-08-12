@@ -1,10 +1,35 @@
-import styled from "styled-components";
+import { useContext, useEffect, useState } from "react";
 import { AiOutlineDown } from "react-icons/ai";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import dotenv from 'dotenv';
 import onClickOutside from "react-onclickoutside";
+import styled from "styled-components";
+
+import { TokenContext } from '../context/TokenContext';
+
+dotenv.config();
 
 function Logout () {
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
     const [showMenu, setShowMenu] = useState(false);
+    const [profilePic, setProfilePic] = useState();
+    let { header } = useContext(TokenContext);
+    const navigate = useNavigate();
+
+    useEffect(()=>{
+        ( async ()=>{
+           
+           const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
+           setProfilePic(user.data.pictureUrl)
+        })()});
+
+    function clearUser () {
+        header = "";
+        localStorage.clear();
+        navigate("/");
+    }
     
     const toggle = () => {
         if (showMenu === false) {
@@ -34,10 +59,18 @@ function Logout () {
         )
     }
 
+    const Menu = () => {
+        return (
+            <LogoutContainer>
+                <h2 onClick={clearUser}>Logout</h2>
+            </LogoutContainer>
+        )
+    }
+
     return (
         <Container>
             { showMenu ? <IconDown /> : <IconUp /> }
-            <img onClick={toggle} src="https://lh3.googleusercontent.com/ogw/AOh-ky1uDVppF3sSrOm6f55jVSFu569TKb9eMJz4kWWY4Q=s32-c-mo" alt="Imagem de perfil do usuário logado" /> 
+            <img onClick={toggle} src={profilePic} alt="Imagem de perfil do usuário que publicou" /> 
             { showMenu ? <Menu /> : null }
         </Container>
     )
@@ -47,13 +80,7 @@ const clickOutsideConfig = {
     handleClickOutside: () => Logout.handleClickOutside,
 };
 
-const Menu = () => {
-    return (
-        <LogoutContainer>
-            <h2>Logout</h2>
-        </LogoutContainer>
-    )
-}
+
 
 const Container =styled.div`
 background: #151515;

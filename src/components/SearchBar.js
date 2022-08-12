@@ -80,7 +80,6 @@ const ResultsList = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    z-index: -1;
 `;
 
 const SearchInput = styled.div`
@@ -90,6 +89,7 @@ const SearchInput = styled.div`
     background: #FFFFFF;
     display: flex;
     position: relative;
+    z-index: 1;
 
     .searchBar-input {
         width: 100%;
