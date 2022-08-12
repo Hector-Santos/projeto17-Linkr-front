@@ -16,14 +16,19 @@ export default function NewPost(){
     const [botao, setBotao] = useState("Publish")
     const [colorButton, setColorButton] = useState("#1877F2");
     const [colorInput, setColorInput] = useState("black");
-    const {header} = useContext(TokenContext)
+    const {header, token} = useContext(TokenContext)
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
     useEffect(()=>{
         ( async ()=>{
-           
+           try{
+            if(token){
            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
            setProfilePic(user.data.pictureUrl)
+                     }
+           }catch(err){
+            console.log(err)
+           }
         })()});
 
     
