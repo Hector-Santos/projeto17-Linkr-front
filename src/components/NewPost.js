@@ -35,11 +35,16 @@ export default function NewPost(){
         setBotao(<ThreeDots color="white" height={80} width={80} />)
         let body = {
             link:link,
-            password:content
+            content:content
         }
-        console.log(body)
-        let promise = axios.post(`${REACT_APP_API_URL}/signin`, body)
+        
+        let promise = axios.post(`${REACT_APP_API_URL}/posts`, body, header)
         promise.then((response => {
+           
+            setColorButton("#1877F2")
+            setColorInput("black")
+            setDisabled(false)
+            setBotao("Publish")
 
           }))
           promise.catch((error => {
