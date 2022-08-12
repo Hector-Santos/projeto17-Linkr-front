@@ -20,10 +20,7 @@ const Wrapper = styled.section`
     margin-top: 140px;
     justify-content: center;
 
-    div{
-        display: flex;
-        flex-direction: column;
-    }
+    
     @media only screen and (max-width: 640px) {
         width: 95%;
     }
@@ -51,10 +48,11 @@ export default function Timeline(){
         <>
             <Header />
             <Wrapper>
-            <div>
-            <NewPost/>
-            <Posts />
-            </div>
+                <div>
+                    <PageTitle text="timeline" />
+                    <NewPost/>
+                    <Posts />
+                </div>
                 <TrendingSidebar />
             </Wrapper>
         </>

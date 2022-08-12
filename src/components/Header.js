@@ -17,6 +17,7 @@ const HeaderEl = styled.header`
     align-items: center;
     justify-content: space-between;
     color: #fff;
+    z-index: 1;
 
     h1 {
         font-family: 'Passion One', cursive;

@@ -12,7 +12,7 @@ const PostDiv = styled.div`
     padding: 30px;
     box-sizing: border-box;
     background-color: #171717;
-    margin-bottom: 40px;
+    margin: 40px auto;
     border-radius: 16px;
 
     .left-side > img {
@@ -124,7 +124,7 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
 
     function formatPostContent(){
 
-        const formattedHashtags = [...hashtags].map(hashtag => `#${hashtag}`);
+        const formattedHashtags = [...hashtags].filter(hashtag => hashtag !== '').map(hashtag => `#${hashtag}`);
 
         return(
             <p>

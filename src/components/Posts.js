@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 import styled from "styled-components";
 import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
-import PageTitle from "./PageTitle";
 
 dotenv.config();
 
@@ -13,7 +12,7 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const PostsDiv = styled.div`
 
-    width: 70%;
+    width: 100%;
 
     @media only screen and (max-width: 640px) {
         width: 100%;
@@ -80,7 +79,6 @@ export default function Posts(){
 
     return(
         <PostsDiv>
-            <PageTitle text="timeline" />
             {getPosts(loading, posts)}
         </PostsDiv>
     );

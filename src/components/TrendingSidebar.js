@@ -13,7 +13,7 @@ const TrendingDiv = styled.div`
     margin-left: 20px;
     background-color: #171717;
     border-radius: 16px;
-    width: 30%;
+    width: 65%;
     padding: 20px;
     height: fit-content;
     
@@ -36,16 +36,22 @@ const TrendingDiv = styled.div`
         color: #fff;
     }
 
+    @media only screen and (max-width: 640px) {
+        display: none;
+    }
+
 `;
 
 export default function TrendingSidebar(){
 
     const [hashtags, setHashtags] = useState([]);
 
-    function getHashtags(){
+    function getHashtagsContent(){
 
-        hashtags.sort((a, b) => a.count - b.count);
-        return hashtags.map(hashtag => <TrendingHashtag name={hashtag.name} />)
+        const validHashtags = [...hashtags].filter(hashtag => hashtag !== '');
+
+        validHashtags.sort((a, b) => a.count - b.count);
+        return validHashtags.map(hashtag => <TrendingHashtag name={hashtag.name} />)
 
     }
 
@@ -56,7 +62,7 @@ export default function TrendingSidebar(){
             try {
                 
                 const { data } = await axios.get(`${REACT_APP_API_URL}/trending-hashtags`);
-                setHashtags([...data]);
+                setHashtags(data);
 
             } catch (err) {
                 console.log(err);
@@ -65,13 +71,13 @@ export default function TrendingSidebar(){
 
         })();
 
-    });
+    }, []);
 
     return(
         <TrendingDiv>
             <h5><strong>Trending</strong></h5>
             <hr />
-            {getHashtags()}
+            {getHashtagsContent()}
         </TrendingDiv>
     );
 
