@@ -17,6 +17,10 @@ const Wrapper = styled.section`
     margin-top: 140px;
     justify-content: center;
 
+    @media only screen and (max-width: 640px) {
+        width: 95%;
+    }
+
 `;
 
 export default function Timeline(){

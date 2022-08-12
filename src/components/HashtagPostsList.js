@@ -11,7 +11,13 @@ dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const PostsDiv = styled.div`
+
     width: 70%;
+
+    @media only screen and (max-width: 640px) {
+        width: 100%;
+    }
+
 `;
 
 export default function HashtagPostsList(){
