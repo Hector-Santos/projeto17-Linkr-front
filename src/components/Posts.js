@@ -4,22 +4,55 @@ import Post from "./Post";
 import dotenv from 'dotenv';
 import styled from "styled-components";
 import ReactLoading from 'react-loading';
+import { useParams } from "react-router-dom";
+import PageTitle from "./PageTitle";
 
 dotenv.config();
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const PostsDiv = styled.div`
+
     width: 70%;
+
+    @media only screen and (max-width: 640px) {
+        width: 100%;
+    }
+    
 `;
 
 const CenteredDiv = styled.div`
     text-align: -webkit-center;
     display: flex;
     justify-content: center;
-    font-family: 'Oswald', sans-serif;   
+    font-family: 'Oswald', sans-serif;
     font-size: 26px;
 `;
+
+function getPosts(loading, posts){
+
+    if(loading) return (
+        <CenteredDiv>
+            <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
+        </CenteredDiv>
+    );
+
+    if(posts.length === 0){
+
+        return (
+            <CenteredDiv>
+                <p>There are no posts yet :(</p>
+            </CenteredDiv>
+        );
+
+    } else {
+
+        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} />);
+        return postsList;
+
+    }
+
+}
 
 export default function Posts(){
 
@@ -33,7 +66,6 @@ export default function Posts(){
             try {
                 
                 const { data } = await axios.get(`${REACT_APP_API_URL}/timeline`);
-                console.log('posts ', data);
                 setPosts(data);
                 setLoading(false);
 
@@ -46,35 +78,15 @@ export default function Posts(){
 
     }, []);
 
-    function getPosts(){
-
-        if(loading) return (
-            <CenteredDiv>
-                <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
-            </CenteredDiv>
-        );
-
-        if(posts.length === 0){
-
-            return (
-                <CenteredDiv>
-                    <p>There are no posts yet :(</p>
-                </CenteredDiv>
-            );
-
-        } else {
-
-            const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} links={post.links} likes={post.likes} hashtags={post.hashtags} />);
-            return postsList;
-
-        }
-
-    }
-
     return(
         <PostsDiv>
-            {getPosts()}
+            <PageTitle text="timeline" />
+            {getPosts(loading, posts)}
         </PostsDiv>
     );
 
+};
+
+export {
+    getPosts
 };

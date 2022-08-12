@@ -62,9 +62,57 @@ const PostDiv = styled.div`
         display: flex;
         flex-direction: column;
     }
+
+    @media only screen and (max-width: 640px) {
+
+        
+
+        padding: 10px;
+        max-width: 100%;
+
+        .left-side > img {
+            width: 34px;
+            height: 34px;
+        }
+
+        .left-side {
+            text-align: center;
+        }
+
+        .left-side > span {
+            margin-top: 15px;
+            font-size: 26px;
+        }
+
+        .left-side > p {
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .post-info {
+            margin-left: 6px;
+        }
+
+        .post-info > h3 {
+            margin-bottom: 6px;
+            font-size: 17px;
+        }
+
+        .post-info > p {
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .post-info .links {
+            display: flex;
+            flex-direction: column;
+        }
+
+    }
+
 `;
 
-export default function Post({ authorPic, authorUsename, postContent, links, likes, hashtags }){
+export default function Post({ authorPic, authorUsename, postContent, link, likes, hashtags, postId }){
 
     const navigate = useNavigate();
 
@@ -76,6 +124,8 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
 
     function formatPostContent(){
 
+        const formattedHashtags = [...hashtags].map(hashtag => `#${hashtag}`);
+
         return(
             <p>
                 {postContent}
@@ -83,7 +133,7 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
                     colors={"white"}
                     tagClicked={goToHashtag}>
                     <span>
-                        {hashtags.join(' ')}
+                        {formattedHashtags.join(' ')}
                     </span>
                 </ReactTagify>
             </p>
@@ -108,7 +158,7 @@ export default function Post({ authorPic, authorUsename, postContent, links, lik
                 {formatPostContent()}
 
                 <div className="links">
-                    {links.map(link => <PostLink linkUrl={link.url} linkId={link.id} />)}
+                    <PostLink linkUrl={link} postId={postId} />
                 </div>
 
             </div>
