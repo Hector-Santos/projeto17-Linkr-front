@@ -35,9 +35,8 @@ const SearchContainer = styled.div`
         position: absolute;
         right: 0;
         top: 0;
-        color: #C6C6C6;
+        color: #C6C6C6;}
 `
-
 const SearchInput = styled.div`
     width: 563px;
     height: 45px;

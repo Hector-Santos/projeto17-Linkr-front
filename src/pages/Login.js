@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import {Link} from 'react-router-dom'
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
@@ -20,6 +20,15 @@ export default function Login(){
     const [colorInput, setColorInput] = useState("black");
     const navigate = useNavigate();
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
+     useEffect(()=>{
+         ( ()=>{
+                 const localStorageToken = window.localStorage.getItem('token')
+                 if(localStorageToken){
+                    setToken(localStorageToken)
+                    navigate("/timeline")
+                 }
+         })()});
  
     function fazerLogin(event) {
         event.preventDefault()
@@ -34,8 +43,8 @@ export default function Login(){
         console.log(body)
         let promise = axios.post(`${REACT_APP_API_URL}/signin`, body)
         promise.then((response => {
+            window.localStorage.setItem('token', response.data)
             setToken(response.data)
-            console.log("token", response.data)
             navigate("/timeline")  
           }))
           promise.catch((error => {
@@ -85,7 +94,6 @@ box-sizing: border-box;
 display: flex;
 align-items: center;
 justify-content: flex-start;
-font-family: 'Raleway', sans-serif;
 font-size: 20px;
 height: 100vh;
 width: 100vw;

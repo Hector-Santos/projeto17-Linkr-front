@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Container, Form, Logo } from './Login';
 import {Link} from 'react-router-dom'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from 'react'
 import axios from 'axios';
 import { useNavigate, } from "react-router-dom";
@@ -20,6 +20,12 @@ export default function Cadastro(){
     const [colorInput, setColorInput] = useState("black");
     const navigate = useNavigate();
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
+    useEffect(()=>{
+        ( ()=>{
+                if(window.localStorage.getItem('token'))
+                navigate("/timeline")
+        })()});
 
     function fazerCadastro(event) {
         event.preventDefault()

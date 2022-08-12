@@ -28,6 +28,7 @@ const TrendingDiv = styled.div`
         display: block;
         color: #fff;
     }
+   
 `;
 
 export default function TrendingSidebar(){
