@@ -36,16 +36,13 @@ export default function Timeline(){
     const navigate = useNavigate();
     useEffect(()=>{
         ( ()=>{
-            console.log("useeffect")
+           
                 const localStorageToken = window.localStorage.getItem('token')
                 if(localStorageToken && !token){
-                    console.log("1")
                    setToken(localStorageToken)
                 }else if(!localStorageToken && !token){
-                    console.log("2")
                  navigate("/")
                 }else if(!localStorageToken && token){
-                    console.log("3")
                     window.localStorage.setItem('token', token)
                 }
         })()});
