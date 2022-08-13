@@ -5,6 +5,14 @@ import { IoMdTrash } from 'react-icons/io';
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
+import Modal from "react-modal";
+import { useState, useContext } from "react";
+import axios from "axios";
+import { TokenContext } from '../context/TokenContext';
+import dotenv from 'dotenv';
+import { RotatingLines } from "react-loader-spinner";
+
+dotenv.config();
 
 const PostDiv = styled.div`
     
@@ -119,9 +127,86 @@ const PostDiv = styled.div`
 
 `;
 
+const ModalText = styled.h1`
+    font-family: 'Lato';
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 41px;
+    text-align: center;
+    color: #FFFFFF;
+`;
+
+const ModalButtons = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+`;
+
+const CancelButton = styled.button`
+    width: 134px;
+    height: 37px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    font-family: 'Lato';
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 22px;
+    color: #1877F2;
+    cursor: pointer;
+`;
+
+const DeleteButton = styled.button`
+    width: 134px;
+    height: 37px;
+    background-color: #1877F2;
+    border-radius: 5px;
+    font-family: 'Lato';
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 22px;
+    color: #FFFFFF;
+    cursor: pointer;
+`;
+
 export default function Post({ authorPic, authorUsename, postContent, link, likes, hashtags, postId }){
 
     const navigate = useNavigate();
+    const [modalOpen, setModalOpen] = useState(false);
+    const [loader, setLoader] = useState(false);
+    const {header} = useContext(TokenContext);
+    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
+    Modal.setAppElement('*')
+
+    const customStyles = {
+        overlay: { zIndex: 3 },
+        content: {
+            width: '597px',
+            height: '262px',
+            borderRadius: '50px',
+            background: '#333333',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'   
+        }
+    }
+
+    async function deletePost() {
+        setLoader(true);
+
+       try{
+            await axios.delete(`${REACT_APP_API_URL}/post/${postId}`, header)
+            console.log("Success!")
+        } catch (error) {
+            console.log(error)
+        }
+        setLoader(false);
+        setModalOpen(false);
+    }
 
     function goToHashtag(hashtagName){
 
@@ -149,32 +234,58 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
     }
 
     return(
-        <PostDiv>
+        <>
+            <Modal
+                isOpen={modalOpen}
+                onRequestClose={() => setModalOpen(false)}
+                style={customStyles}
+            >
+                {loader === true ? (
+                    <RotatingLines strokeColor='white' width={200} />
+                ) : (
+                    <>
+                        <ModalText>
+                            Are you sure you want<br />to delete this post?
+                        </ModalText>
+                        <ModalButtons>
+                            <CancelButton onClick={() => setModalOpen(false)}>
+                                No, go back
+                            </CancelButton>
+                            <DeleteButton onClick={() => deletePost()}>
+                                Yes, delete it
+                            </DeleteButton>
+                        </ModalButtons>
+                    </>
+                )}
+            </Modal>
+            <PostDiv>
 
-            <div className="left-side">
-                <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
-                <span>
-                    <AiOutlineHeart />
-                </span>
-                <p>{formatLikes(likes)} Likes</p>
-            </div>
-
-            <div className="post-info">
-                <span>
-                    <h3>{authorUsename}</h3>
-                    
-                    <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => alert("Button working")}/>
-                </span>
-
-                {formatPostContent()}
-
-                <div className="links">
-                    <PostLink linkUrl={link} postId={postId} />
+                <div className="left-side">
+                    <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
+                    <span>
+                        <AiOutlineHeart />
+                    </span>
+                    <p>{formatLikes(likes)} Likes</p>
                 </div>
 
-            </div>
+                <div className="post-info">
+                    <span>
+                        <h3>{authorUsename}</h3>
+                        
+                        <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => setModalOpen(true)}/>
+                    </span>
 
-        </PostDiv>
+                    {formatPostContent()}
+
+                    <div className="links">
+                        <PostLink linkUrl={link} postId={postId} />
+                    </div>
+
+                </div>
+
+            </PostDiv>
+        </>
+        
     );
 
 };
