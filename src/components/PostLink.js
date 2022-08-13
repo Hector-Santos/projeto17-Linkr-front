@@ -1,7 +1,8 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import dotenv from 'dotenv';
+import { TokenContext } from "../context/TokenContext";
 dotenv.config();
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -91,6 +92,7 @@ const LinkDiv = styled.div`
 export default function PostLink({ linkUrl, postId }){
 
     const [metadata, setMetadata] = useState({});
+    const {header} = useContext(TokenContext);
 
     useEffect(()=>{
 
@@ -98,7 +100,7 @@ export default function PostLink({ linkUrl, postId }){
 
             try {
                 
-                const { data } = await axios.get(`${REACT_APP_API_URL}/get-url-metadata/${postId}`);
+                const { data } = await axios.get(`${REACT_APP_API_URL}/get-url-metadata/${postId}`, header);
                 setMetadata({...data});
 
             } catch (err) {
@@ -108,7 +110,7 @@ export default function PostLink({ linkUrl, postId }){
 
         })();
 
-    }, []);
+    }, [header]);
 
     return(
         <LinkDiv>

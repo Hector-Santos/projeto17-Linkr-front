@@ -4,6 +4,7 @@ import { DebounceInput } from "react-debounce-input";
 import axios from "axios";
 import dotenv from 'dotenv';
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 dotenv.config();
 
@@ -23,11 +24,13 @@ function SearchBar () {
         }
     }
 
-    function SearchResult ({ username, pictureUrl }) {
+    function SearchResult ({ username, pictureUrl, userId }) {
         return (
             <ResultsItem>
-                <img src={pictureUrl} alt={'img'} />
-                <h2>{username}</h2>
+                <Link to={`/user/${userId}`}>
+                    <img src={pictureUrl} alt={'img'} />
+                    <h2>{username}</h2>
+                </Link>
             </ResultsItem>
         )
     }
@@ -57,6 +60,7 @@ function SearchBar () {
                         return <SearchResult
                             pictureUrl={user.pictureUrl}
                             username={user.username}
+                            userId={user.id}
                             key={i} />
                     })
                 ) : ""}
@@ -124,19 +128,24 @@ const SearchInput = styled.div`
 `;
 
 const ResultsItem = styled.div`
-    padding-bottom: 10px;
-    padding-top: 10px;
-    display: flex;
-    align-items: center;
+
+    a {
+        padding-bottom: 10px;
+        padding-top: 10px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
  
-    img {
+    a img {
         width: 39px;
         height: 39px;
         margin-left: 15px;
         border-radius: 50%;
     }
   
-    h2 {
+    a h2 {
         margin-left: 15px;
         font-family: 'Lato';
         font-weight: 400;

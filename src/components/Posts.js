@@ -1,10 +1,11 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Post from "./Post";
 import dotenv from 'dotenv';
 import styled from "styled-components";
 import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
+import { TokenContext } from '../context/TokenContext';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ const CenteredDiv = styled.div`
     justify-content: center;
     font-family: 'Oswald', sans-serif;
     font-size: 26px;
+    margin: 30px 0;
 `;
 
 function getPosts(loading, posts){
@@ -57,14 +59,22 @@ export default function Posts(){
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const {header} = useContext(TokenContext);
+    const { id: userId } = useParams();
 
     useEffect(()=>{
 
         (async ()=>{
 
             try {
-                
-                const { data } = await axios.get(`${REACT_APP_API_URL}/timeline`);
+
+                if(!header) return;
+
+                const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}` : `${REACT_APP_API_URL}/timeline`;
+
+                console.log('requestUrl ----', requestUrl, userId);
+
+                const { data } = await axios.get(requestUrl, header);
                 setPosts(data);
                 setLoading(false);
 
@@ -75,7 +85,7 @@ export default function Posts(){
 
         })();
 
-    }, []);
+    }, [header]);
 
     return(
         <PostsDiv>
