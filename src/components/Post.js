@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { IoMdTrash } from 'react-icons/io';
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +45,12 @@ const PostDiv = styled.div`
         flex-direction: column;
         font-family: 'Lato', sans-serif;
         margin-left: 25px;
+    }
+
+    .post-info > span {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
     }
 
     .post-info > h3 {
@@ -153,8 +160,12 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
             </div>
 
             <div className="post-info">
+                <span>
+                    <h3>{authorUsename}</h3>
+                    
+                    <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => alert("Button working")}/>
+                </span>
 
-                <h3>{authorUsename}</h3>
                 {formatPostContent()}
 
                 <div className="links">
