@@ -168,7 +168,7 @@ const DeleteButton = styled.button`
     cursor: pointer;
 `;
 
-export default function Post({ authorPic, authorUsename, postContent, link, likes, hashtags, postId }){
+export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
     const navigate = useNavigate();
     const [modalOpen, setModalOpen] = useState(false);
@@ -212,6 +212,21 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
         setLoader(false);
         setModalOpen(false);
         refreshPage();
+    }
+
+    function DeleteIcon() {
+        if (loggedUser !== authorId) {
+            return (
+                <></>
+            )
+        }
+
+        if (loggedUser === authorId) {
+            return (
+                <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => setModalOpen(true)}/>
+            )
+        }
+        
     }
 
     function goToHashtag(hashtagName){
@@ -278,7 +293,7 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
                     <span>
                         <h3>{authorUsename}</h3>
                         
-                        <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => setModalOpen(true)}/>
+                        <DeleteIcon />
                     </span>
 
                     {formatPostContent()}
