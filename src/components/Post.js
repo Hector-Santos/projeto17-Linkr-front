@@ -206,6 +206,8 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
             await axios.delete(`${REACT_APP_API_URL}/post/${postId}`, header)
         } catch (error) {
             console.log(error)
+            alert("Error: cannot delete post. ")
+            refreshPage();
         }
         setLoader(false);
         setModalOpen(false);
