@@ -195,17 +195,21 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
         }
     }
 
+    function refreshPage() {
+        window.location.reload(false);
+    }
+
     async function deletePost() {
         setLoader(true);
 
        try{
             await axios.delete(`${REACT_APP_API_URL}/post/${postId}`, header)
-            console.log("Success!")
         } catch (error) {
             console.log(error)
         }
         setLoader(false);
         setModalOpen(false);
+        refreshPage();
     }
 
     function goToHashtag(hashtagName){
