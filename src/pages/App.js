@@ -6,6 +6,7 @@ import Login from "./Login.js"
 import Cadastro from "./Cadastro.js";
 import Timeline from "../components/Timeline.js";
 import HashtagPostsPage from "../components/HashtagPostsPage.js";
+import UserPosts from "../components/UserPosts.js";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/hashtag/:hashtagName" element={<HashtagPostsPage />} />
           <Route path="/timeline" element={<Timeline />} />
+          <Route path="/user/:id" element={<UserPosts />} />
         </Routes>
       </TokenProvider>
     </BrowserRouter>
