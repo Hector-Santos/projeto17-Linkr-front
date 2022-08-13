@@ -30,7 +30,7 @@ const CenteredDiv = styled.div`
     margin: 30px 0;
 `;
 
-function getPosts(loading, posts){
+function getPosts(loading, posts, loggedUser){
 
     if(loading) return (
         <CenteredDiv>
@@ -48,7 +48,7 @@ function getPosts(loading, posts){
 
     } else {
 
-        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} />);
+        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser}/>);
         return postsList;
 
     }
@@ -59,6 +59,7 @@ export default function Posts(){
 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loggedUser, setLoggedUser] = useState("");
     const {header} = useContext(TokenContext);
     const { id: userId } = useParams();
 
@@ -87,9 +88,22 @@ export default function Posts(){
 
     }, [header]);
 
+    useEffect(() => {
+        const REACT_APP_API_URL = process.env.REACT_APP_API_URL; 
+        const getId = axios.get(`${REACT_APP_API_URL}/userId`, header);
+
+        getId.then((response)=>{
+            console.log(response.data.id);
+            setLoggedUser(response.data.id);
+            console.log("Logged user: " + loggedUser);
+        }).catch((err)=>{
+            console.error(err)
+        })
+    }, [header])
+
     return(
         <PostsDiv>
-            {getPosts(loading, posts)}
+            {getPosts(loading, posts, loggedUser)}
         </PostsDiv>
     );
 
