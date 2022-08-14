@@ -5,13 +5,14 @@ import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import { useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
 import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 
 dotenv.config();
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const PostDiv = styled.div`
     
@@ -195,14 +196,15 @@ const EditContainer = styled.textarea`
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
     const navigate = useNavigate();
+    const [liked, setLiked] = useState(false)
+    const [thisLikes, setThisLikes] = useState(likes)
+    const {token,header} = useContext(TokenContext)
     const [modalOpen, setModalOpen] = useState(false);
     const [enableEdit, setEnableEdit] = useState(false);
     const [loadDelete, setLoadDelete] = useState(false);
     const [loadEdit, setLoadEdit] = useState(false);
     const [newContent, setNewContent] = useState(postContent);
     const element = useRef("");
-    const {header} = useContext(TokenContext);
-    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
     Modal.setAppElement('*')
 
@@ -278,11 +280,68 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         }
         
     }
-
     function goToHashtag(hashtagName){
 
         navigate(`/hashtag/${hashtagName.replace(/#/gi, "")}`);
 
+    }
+    
+    useEffect(()=>{
+        ( async ()=>{
+
+            if(token){ 
+            let promise = axios.get(`${REACT_APP_API_URL}/likedPosts/${postId}`, header)
+            promise.then((response => {
+                setLiked(response.data)     
+            }))   
+            promise.catch(error =>{
+                console.log(error)
+            })
+        }    
+        })()},[token,liked, header, postId]);
+
+    function likePost(){
+        const body = {
+            postId:postId
+        }
+       
+    if(liked){
+        if(token){
+        console.log(header)
+        let promise = axios.delete(`${REACT_APP_API_URL}/likedPosts`,{headers:{Authorization:token},data:{"postId":postId}})
+        promise.then(()=>{
+        setLiked(false)
+        setThisLikes(thisLikes - 1)
+        })
+        promise.catch(error =>{
+            console.log(error)
+        })
+        promise = axios.put(`${REACT_APP_API_URL}/posts/subtract`, body , header)
+        promise.then()
+        promise.catch(error =>{
+            console.log(error)
+        })
+    }
+    }else{
+
+        if(token){
+            console.log(body)
+        let promise = axios.post(`${REACT_APP_API_URL}/likedPosts`, body , header)
+        promise.then(()=>{
+            setLiked(true)
+            setThisLikes(thisLikes + 1)
+            })
+        promise.catch(error =>{
+            console.log(error)
+        })
+        promise = axios.put(`${REACT_APP_API_URL}/posts/add`, body , header)
+        promise.then()
+        promise.catch(error =>{
+            console.log(error)
+        })
+    }
+    }
+        
     }
 
     function formatPostContent(){
@@ -351,15 +410,13 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 )}
             </Modal>
             <PostDiv>
-
-                <div className="left-side">
-                    <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
-                    <span>
-                        <AiOutlineHeart />
-                    </span>
-                    <p>{formatLikes(likes)} Likes</p>
-                </div>
-
+            <div className="left-side">
+                <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
+                <span>
+                    {liked? <AiFillHeart onClick={likePost} /> : <AiOutlineHeart onClick={likePost}/>}
+                </span>
+                <p>{formatLikes(thisLikes) } Likes</p>
+            </div>
                 <div className="post-info">
                     <span>
                         <h3>{authorUsename}</h3>

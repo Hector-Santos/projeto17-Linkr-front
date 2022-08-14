@@ -5,7 +5,7 @@ import { ThreeDots } from 'react-loader-spinner';
 import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
 dotenv.config();
-
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 
 export default function NewPost(){
@@ -17,12 +17,12 @@ export default function NewPost(){
     const [colorButton, setColorButton] = useState("#1877F2");
     const [colorInput, setColorInput] = useState("black");
     const {header, token} = useContext(TokenContext)
-    const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+   
 
     useEffect(()=>{
         ( async ()=>{
            try{
-            if(token){
+            if(header){
            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
            setProfilePic(user.data.pictureUrl)
                      }

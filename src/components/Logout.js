@@ -20,9 +20,10 @@ function Logout () {
 
     useEffect(()=>{
         ( async ()=>{
-           
+           if(header){
            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
            setProfilePic(user.data.pictureUrl)
+           }
         })()});
 
     function clearUser () {

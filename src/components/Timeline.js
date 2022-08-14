@@ -34,14 +34,16 @@ export default function Timeline(){
     useEffect(()=>{
         ( ()=>{
            
-                const localStorageToken = window.localStorage.getItem('token')
-                if(localStorageToken && !token){
-                   setToken(localStorageToken)
-                }else if(!localStorageToken && !token){
-                 navigate("/")
-                }else if(!localStorageToken && token){
-                    window.localStorage.setItem('token', token)
-                }
+            const localStorageToken = window.localStorage.getItem('token')
+            if(localStorageToken && !token){
+               setToken(localStorageToken)
+            }else if(!localStorageToken && !token){
+             navigate("/")
+            }else if(!localStorageToken && token){
+                window.localStorage.setItem('token', token)
+            }else if(token && localStorageToken){
+                window.localStorage.setItem('token', token)
+            }
         })()});
 
     return (

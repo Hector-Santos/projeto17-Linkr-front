@@ -30,6 +30,7 @@ const CenteredDiv = styled.div`
     margin: 30px 0;
 `;
 
+
 function getPosts(loading, posts, loggedUser){
 
     if(loading) return (
@@ -48,7 +49,7 @@ function getPosts(loading, posts, loggedUser){
 
     } else {
 
-        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser}/>);
+        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser} key = {post.id}/>);
         return postsList;
 
     }
@@ -74,8 +75,8 @@ export default function Posts(){
                 const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}` : `${REACT_APP_API_URL}/timeline`;
 
                 console.log('requestUrl ----', requestUrl, userId);
-
-                const { data } = await axios.get(requestUrl, header);
+                
+                 const { data } =  await axios.get(requestUrl, header) ;
                 setPosts(data);
                 setLoading(false);
 
@@ -86,10 +87,11 @@ export default function Posts(){
 
         })();
 
-    }, [header]);
+    }, [header, userId]);
 
     useEffect(() => {
         const REACT_APP_API_URL = process.env.REACT_APP_API_URL; 
+        if(!header) return;
         const getId = axios.get(`${REACT_APP_API_URL}/userId`, header);
 
         getId.then((response)=>{
