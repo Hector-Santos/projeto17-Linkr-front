@@ -163,7 +163,7 @@ const CancelButton = styled.button`
 const DeleteButton = styled.button`
     width: 134px;
     height: 37px;
-    background-color: #1877F2;
+    background: #1877F2;
     border-radius: 5px;
     font-family: 'Lato';
     font-weight: 700;
@@ -171,6 +171,25 @@ const DeleteButton = styled.button`
     line-height: 22px;
     color: #FFFFFF;
     cursor: pointer;
+`;
+
+const EditContainer = styled.textarea`
+    width: 100%;
+    height: 44px;    
+    background: #FFFFFF;
+    border-radius: 7px;
+    margin: 10px 0;
+    font-family: 'Lato';
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 20px;
+    color: #4C4C4C;
+    resize: vertical;
+    &:focus {
+        box-shadow: 0 0 0 0;
+        border: 0 none;
+        outline: 0;
+    }
 `;
 
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
@@ -251,8 +270,8 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         if (loggedUser === authorId) {
             return (
                 <div className="icons">
-                    <AiFillEdit color='#FFFFFF' onClick={() => setEnableEdit(true)}/>
-                    <AiFillDelete color='#FFFFFF' onClick={() => setModalOpen(true)}/>
+                    <AiFillEdit color='#FFFFFF' onClick={() => setEnableEdit(!enableEdit)}/>
+                    <AiFillDelete color='#FFFFFF' onClick={() => setModalOpen(!modalOpen)}/>
                 </div>
                 
             )
@@ -273,25 +292,21 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         return(
             <>
                 {enableEdit ? (
-                    <form >
-                        <input
-                            ref={element}
-                            type="text"
-                            value={newContent}
-                            onChange={e => setNewContent(e.target.value)}
-                            autoFocus
-                            onKeyDown={(e) => {
-                                if (e.key === "Escape") {
-                                    setEnableEdit(false);
-                                } else if (e.key === "Enter") {
-                                    editPost(e);
-                                }
-                            }}
-                            disabled={loadEdit}
-                            style={{ marginBottom: "10px"}}
-                        />
-                        <button style={{ display: "none"}} type="submit"></button>
-                    </form>
+                    <EditContainer
+                        ref={element}
+                        type="text"
+                        value={newContent}
+                        onChange={e => setNewContent(e.target.value)}
+                        autoFocus
+                        disabled={loadEdit}
+                        onKeyDown={(e) => {
+                            if (e.key === "Escape") {
+                                setEnableEdit(false);
+                            } else if (e.key === "Enter") {
+                                editPost(e);
+                            }
+                        }}
+                    ></EditContainer>
                 ) : (
                     <p>
                     {postContent}
@@ -328,7 +343,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                             <CancelButton onClick={() => setModalOpen(false)}>
                                 No, go back
                             </CancelButton>
-                            <DeleteButton onClick={() => deletePost()}>
+                            <DeleteButton onClick={(e) => deletePost(e)}>
                                 Yes, delete it
                             </DeleteButton>
                         </ModalButtons>

@@ -93,9 +93,7 @@ export default function Posts(){
         const getId = axios.get(`${REACT_APP_API_URL}/userId`, header);
 
         getId.then((response)=>{
-            console.log(response.data.id);
             setLoggedUser(response.data.id);
-            console.log("Logged user: " + loggedUser);
         }).catch((err)=>{
             console.error(err)
         })
