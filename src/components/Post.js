@@ -1,20 +1,18 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import { IoMdTrash } from 'react-icons/io';
+import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit } from "react-icons/ai";
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
-import { useNavigate} from "react-router-dom";
-import { useState,useEffect, useContext } from "react";
-import { TokenContext } from '../context/TokenContext';
+import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
+import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
+import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 
 dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
-
 
 const PostDiv = styled.div`
     
@@ -78,6 +76,12 @@ const PostDiv = styled.div`
     .post-info .links {
         display: flex;
         flex-direction: column;
+    }
+
+    .icons {
+        width: 40px;
+        display: flex;
+        justify-content: space-between;
     }
 
     @media only screen and (max-width: 640px) {
@@ -160,7 +164,7 @@ const CancelButton = styled.button`
 const DeleteButton = styled.button`
     width: 134px;
     height: 37px;
-    background-color: #1877F2;
+    background: #1877F2;
     border-radius: 5px;
     font-family: 'Lato';
     font-weight: 700;
@@ -170,6 +174,25 @@ const DeleteButton = styled.button`
     cursor: pointer;
 `;
 
+const EditContainer = styled.textarea`
+    width: 100%;
+    height: 44px;    
+    background: #FFFFFF;
+    border-radius: 7px;
+    margin: 10px 0;
+    font-family: 'Lato';
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 20px;
+    color: #4C4C4C;
+    resize: vertical;
+    &:focus {
+        box-shadow: 0 0 0 0;
+        border: 0 none;
+        outline: 0;
+    }
+`;
+
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
     const navigate = useNavigate();
@@ -177,7 +200,11 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
     const [thisLikes, setThisLikes] = useState(likes)
     const {token,header} = useContext(TokenContext)
     const [modalOpen, setModalOpen] = useState(false);
-    const [loader, setLoader] = useState(false);
+    const [enableEdit, setEnableEdit] = useState(false);
+    const [loadDelete, setLoadDelete] = useState(false);
+    const [loadEdit, setLoadEdit] = useState(false);
+    const [newContent, setNewContent] = useState(postContent);
+    const element = useRef("");
 
     Modal.setAppElement('*')
 
@@ -202,22 +229,40 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         window.location.reload(false);
     }
 
-    async function deletePost() {
-        setLoader(true);
+    async function deletePost(e) {
+        e.preventDefault();
+        setLoadDelete(true);
 
-       try{
-            await axios.delete(`${REACT_APP_API_URL}/post/${postId}`, header)
+        try {
+            await axios.delete(`${REACT_APP_API_URL}/post/${postId}`, header);
         } catch (error) {
             console.log(error)
-            alert("Error: cannot delete post. ")
+            alert("Error: cannot delete post.")
             refreshPage();
         }
-        setLoader(false);
+        setLoadDelete(false);
         setModalOpen(false);
         refreshPage();
     }
 
-    function DeleteIcon() {
+    async function editPost(e) {
+        e.preventDefault();
+        const data = { content: newContent};
+        setLoadEdit(true);
+        
+        try{
+            await axios.put(`${REACT_APP_API_URL}/post/${postId}`, data, header);
+        } catch (error) {
+            console.log(error);
+            alert("Error: cannot edit post.");
+            refreshPage();
+        }
+        setLoadEdit(false);
+        setEnableEdit(false);
+        refreshPage();
+    }
+
+    function EditButtons() {
         if (loggedUser !== authorId) {
             return (
                 <></>
@@ -226,7 +271,11 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
         if (loggedUser === authorId) {
             return (
-                <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => setModalOpen(true)}/>
+                <div className="icons">
+                    <AiFillEdit color='#FFFFFF' onClick={() => setEnableEdit(!enableEdit)}/>
+                    <AiFillDelete color='#FFFFFF' onClick={() => setModalOpen(!modalOpen)}/>
+                </div>
+                
             )
         }
         
@@ -300,16 +349,37 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         const formattedHashtags = [...hashtags].filter(hashtag => hashtag !== '').map(hashtag => `#${hashtag}`);
 
         return(
-            <p>
-                {postContent}
-                <ReactTagify 
-                    colors={"white"}
-                    tagClicked={goToHashtag}>
-                    <span>
-                        {formattedHashtags.join(' ')}
-                    </span>
-                </ReactTagify>
-            </p>
+            <>
+                {enableEdit ? (
+                    <EditContainer
+                        ref={element}
+                        type="text"
+                        value={newContent}
+                        onChange={e => setNewContent(e.target.value)}
+                        autoFocus
+                        disabled={loadEdit}
+                        onKeyDown={(e) => {
+                            if (e.key === "Escape") {
+                                setEnableEdit(false);
+                            } else if (e.key === "Enter") {
+                                editPost(e);
+                            }
+                        }}
+                    ></EditContainer>
+                ) : (
+                    <p>
+                    {postContent}
+                        <ReactTagify 
+                            colors={"white"}
+                            tagClicked={goToHashtag}>
+                            <span>
+                                {formattedHashtags.join(' ')}
+                            </span>
+                        </ReactTagify>
+                    </p>
+                )}
+            </>
+            
         );
 
     }
@@ -321,7 +391,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 onRequestClose={() => setModalOpen(false)}
                 style={customStyles}
             >
-                {loader === true ? (
+                {loadDelete === true ? (
                     <RotatingLines strokeColor='white' width={200} />
                 ) : (
                     <>
@@ -332,7 +402,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                             <CancelButton onClick={() => setModalOpen(false)}>
                                 No, go back
                             </CancelButton>
-                            <DeleteButton onClick={() => deletePost()}>
+                            <DeleteButton onClick={(e) => deletePost(e)}>
                                 Yes, delete it
                             </DeleteButton>
                         </ModalButtons>
@@ -351,7 +421,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     <span>
                         <h3>{authorUsename}</h3>
                         
-                        <DeleteIcon />
+                        <EditButtons />
                     </span>
 
                     {formatPostContent()}
@@ -364,7 +434,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
             </PostDiv>
         </>
-        
+
     );
 
 };

@@ -6,7 +6,6 @@ import styled from "styled-components";
 import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
-import Header from "./Header";
 
 dotenv.config();
 
@@ -88,7 +87,7 @@ export default function Posts(){
 
         })();
 
-    }, [header]);
+    }, [header, userId]);
 
     useEffect(() => {
         const REACT_APP_API_URL = process.env.REACT_APP_API_URL; 
@@ -96,9 +95,7 @@ export default function Posts(){
         const getId = axios.get(`${REACT_APP_API_URL}/userId`, header);
 
         getId.then((response)=>{
-            console.log(response.data.id);
             setLoggedUser(response.data.id);
-            console.log("Logged user: " + loggedUser);
         }).catch((err)=>{
             console.error(err)
         })
