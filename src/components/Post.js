@@ -1,17 +1,20 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
+import { IoMdTrash } from 'react-icons/io';
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate} from "react-router-dom";
 import { useState,useEffect, useContext } from "react";
 import { TokenContext } from '../context/TokenContext';
-
+import Modal from "react-modal";
 import axios from "axios";
 import dotenv from 'dotenv';
+import { RotatingLines } from "react-loader-spinner";
 
 dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
+
 
 const PostDiv = styled.div`
     
@@ -52,6 +55,12 @@ const PostDiv = styled.div`
         flex-direction: column;
         font-family: 'Lato', sans-serif;
         margin-left: 25px;
+    }
+
+    .post-info > span {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
     }
 
     .post-info > h3 {
@@ -120,13 +129,108 @@ const PostDiv = styled.div`
 
 `;
 
-export default function Post({ authorPic, authorUsename, postContent, link, likes, hashtags, postId }){
+const ModalText = styled.h1`
+    font-family: 'Lato';
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 41px;
+    text-align: center;
+    color: #FFFFFF;
+`;
+
+const ModalButtons = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+`;
+
+const CancelButton = styled.button`
+    width: 134px;
+    height: 37px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    font-family: 'Lato';
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 22px;
+    color: #1877F2;
+    cursor: pointer;
+`;
+
+const DeleteButton = styled.button`
+    width: 134px;
+    height: 37px;
+    background-color: #1877F2;
+    border-radius: 5px;
+    font-family: 'Lato';
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 22px;
+    color: #FFFFFF;
+    cursor: pointer;
+`;
+
+export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
     const navigate = useNavigate();
     const [liked, setLiked] = useState(false)
     const [thisLikes, setThisLikes] = useState(likes)
     const {token,header} = useContext(TokenContext)
-   
+    const [modalOpen, setModalOpen] = useState(false);
+    const [loader, setLoader] = useState(false);
+
+    Modal.setAppElement('*')
+
+    const customStyles = {
+        overlay: { zIndex: 3 },
+        content: {
+            width: '597px',
+            height: '262px',
+            borderRadius: '50px',
+            background: '#333333',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'   
+        }
+    }
+
+    function refreshPage() {
+        window.location.reload(false);
+    }
+
+    async function deletePost() {
+        setLoader(true);
+
+       try{
+            await axios.delete(`${REACT_APP_API_URL}/post/${postId}`, header)
+        } catch (error) {
+            console.log(error)
+            alert("Error: cannot delete post. ")
+            refreshPage();
+        }
+        setLoader(false);
+        setModalOpen(false);
+        refreshPage();
+    }
+
+    function DeleteIcon() {
+        if (loggedUser !== authorId) {
+            return (
+                <></>
+            )
+        }
+
+        if (loggedUser === authorId) {
+            return (
+                <IoMdTrash fontSize='1.3em' color='#FFFFFF' onClick={() => setModalOpen(true)}/>
+            )
+        }
+        
+    }
     function goToHashtag(hashtagName){
 
         navigate(`/hashtag/${hashtagName.replace(/#/gi, "")}`);
@@ -145,7 +249,7 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
                 console.log(error)
             })
         }    
-        })()},[token,liked, header, postId, likes ]);
+        })()},[token,liked, header, postId]);
 
     function likePost(){
         const body = {
@@ -158,7 +262,7 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
         let promise = axios.delete(`${REACT_APP_API_URL}/likedPosts`,{headers:{Authorization:token},data:{"postId":postId}})
         promise.then(()=>{
         setLiked(false)
-        setThisLikes(likes - 1)
+        setThisLikes(thisLikes - 1)
         })
         promise.catch(error =>{
             console.log(error)
@@ -176,7 +280,7 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
         let promise = axios.post(`${REACT_APP_API_URL}/likedPosts`, body , header)
         promise.then(()=>{
             setLiked(true)
-            setThisLikes(likes + 1)
+            setThisLikes(thisLikes + 1)
             })
         promise.catch(error =>{
             console.log(error)
@@ -211,8 +315,31 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
     }
 
     return(
-        <PostDiv>
-
+        <>
+            <Modal
+                isOpen={modalOpen}
+                onRequestClose={() => setModalOpen(false)}
+                style={customStyles}
+            >
+                {loader === true ? (
+                    <RotatingLines strokeColor='white' width={200} />
+                ) : (
+                    <>
+                        <ModalText>
+                            Are you sure you want<br />to delete this post?
+                        </ModalText>
+                        <ModalButtons>
+                            <CancelButton onClick={() => setModalOpen(false)}>
+                                No, go back
+                            </CancelButton>
+                            <DeleteButton onClick={() => deletePost()}>
+                                Yes, delete it
+                            </DeleteButton>
+                        </ModalButtons>
+                    </>
+                )}
+            </Modal>
+            <PostDiv>
             <div className="left-side">
                 <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
                 <span>
@@ -220,19 +347,24 @@ export default function Post({ authorPic, authorUsename, postContent, link, like
                 </span>
                 <p>{formatLikes(thisLikes) } Likes</p>
             </div>
+                <div className="post-info">
+                    <span>
+                        <h3>{authorUsename}</h3>
+                        
+                        <DeleteIcon />
+                    </span>
 
-            <div className="post-info">
+                    {formatPostContent()}
 
-                <h3>{authorUsename}</h3>
-                {formatPostContent()}
+                    <div className="links">
+                        <PostLink linkUrl={link} postId={postId} />
+                    </div>
 
-                <div className="links">
-                    <PostLink linkUrl={link} postId={postId} />
                 </div>
 
-            </div>
-
-        </PostDiv>
+            </PostDiv>
+        </>
+        
     );
 
 };

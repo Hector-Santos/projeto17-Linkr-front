@@ -41,6 +41,8 @@ export default function Timeline(){
              navigate("/")
             }else if(!localStorageToken && token){
                 window.localStorage.setItem('token', token)
+            }else if(token && localStorageToken){
+                window.localStorage.setItem('token', token)
             }
         })()});
 
