@@ -31,7 +31,7 @@ const CenteredDiv = styled.div`
 `;
 
 function getPosts(loading, posts){
-
+    
     if(loading) return (
         <CenteredDiv>
             <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
