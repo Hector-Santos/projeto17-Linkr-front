@@ -9,9 +9,11 @@ dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const TrendingDiv = styled.div`
-    
+    max-width: 300px;
+    margin-top: 65px;
     margin-left: 20px;
     background-color: #171717;
+    width: 300px;
     border-radius: 16px;
     width: 65%;
     padding: 20px;
@@ -23,6 +25,7 @@ const TrendingDiv = styled.div`
     }
 
     hr {
+        
         border-color: #484848;
     }
 
