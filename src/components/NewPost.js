@@ -51,6 +51,8 @@ export default function NewPost(){
             setColorInput("black")
             setDisabled(false)
             setBotao("Publish")
+            window.location.reload()
+
 
           }))
           promise.catch((error => {
