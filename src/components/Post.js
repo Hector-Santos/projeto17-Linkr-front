@@ -11,6 +11,7 @@ import Modal from "react-modal";
 import axios from "axios";
 import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
+import ReactTooltip from "react-tooltip";
 
 dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -178,6 +179,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
     const {token,header} = useContext(TokenContext)
     const [modalOpen, setModalOpen] = useState(false);
     const [loader, setLoader] = useState(false);
+    const [likesInfo, setLikesInfo] = useState("Ninguém curtiu este post ainda")
 
     Modal.setAppElement('*')
 
@@ -343,7 +345,17 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             <div className="left-side">
                 <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
                 <span>
-                    {liked? <AiFillHeart onClick={likePost} /> : <AiOutlineHeart onClick={likePost}/>}
+                    {liked ? (
+                        <>
+                            <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
+                            <ReactTooltip place="bottom" type="light" effect="solid" />
+                        </>
+                    ) : (
+                        <>
+                            <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
+                            <ReactTooltip place="bottom" type="light" effect="solid" />
+                        </>
+                    )}
                 </span>
                 <p>{formatLikes(thisLikes) } Likes</p>
             </div>
