@@ -6,7 +6,6 @@ import TrendingSidebar from "./TrendingSidebar";
 import { useEffect,useContext } from "react";
 import { TokenContext } from '../context/TokenContext';
 import { useNavigate } from "react-router-dom";
-import Login from "../pages/Login";
 import PageTitle from "./PageTitle";
 
 

@@ -383,7 +383,16 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         );
 
     }
-
+    async function redirectToUserPage(){
+        if(header){
+            try{
+            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
+            console.log(user.data.id)
+            }catch(err){
+             console.log(err)
+            }
+        }
+    }
     return(
         <>
             <Modal
@@ -419,7 +428,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             </div>
                 <div className="post-info">
                     <span>
-                        <h3>{authorUsename}</h3>
+                        <h3 onClick={redirectToUserPage}>{authorUsename}</h3>
                         
                         <EditButtons />
                     </span>

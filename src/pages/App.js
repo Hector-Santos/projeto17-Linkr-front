@@ -19,7 +19,7 @@ function App() {
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/hashtag/:hashtagName" element={<HashtagPostsPage />} />
           <Route path="/timeline" element={<Timeline />} />
-          <Route path="/user/:id" element={<UserPosts />} />
+          <Route path="/user/:id" element={<UserPost />} />
         </Routes>
       </TokenProvider>
     </BrowserRouter>
