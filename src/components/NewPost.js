@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ThreeDots } from 'react-loader-spinner';
 import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
+import defaultProfile from '../assets/defaultprofile.png'
 dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
@@ -29,7 +30,7 @@ export default function NewPost(){
            }catch(err){
             console.log(err)
            }
-        })()});
+        })()},[header, profilePic]);
 
     
     function submitPost(event) {
@@ -71,7 +72,8 @@ export default function NewPost(){
     return (
         
         <Container disabled={disabled} colorInput= {colorInput} colorButton={colorButton}>
-       <img src={profilePic} alt="Imagem de perfil do usuário que publicou" />
+      {profilePic ? <img  src={profilePic} alt="Imagem de perfil do usuário que publicou" /> 
+             : <img src={defaultProfile} alt="default profile" /> }
         <Form >
             <h1>What are you going to share today?</h1>
         <form onSubmit={submitPost}>

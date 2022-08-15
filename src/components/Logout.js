@@ -5,6 +5,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import onClickOutside from "react-onclickoutside";
 import styled from "styled-components";
+import defaultProfile from '../assets/defaultprofile.png'
 
 import { TokenContext } from '../context/TokenContext';
 
@@ -24,7 +25,7 @@ function Logout () {
            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
            setProfilePic(user.data.pictureUrl)
            }
-        })()});
+        })()},[profilePic,REACT_APP_API_URL, header]);
 
     function clearUser () {
         header = "";
@@ -71,7 +72,8 @@ function Logout () {
     return (
         <Container>
             { showMenu ? <IconDown /> : <IconUp /> }
-            <img onClick={toggle} src={profilePic} alt="Imagem de perfil do usuário que publicou" /> 
+             {profilePic ? <img onClick={toggle} src={profilePic} alt="Imagem de perfil do usuário que publicou" /> 
+             : <img onClick={toggle} src={defaultProfile} alt="default profile" /> }
             { showMenu ? <Menu /> : null }
         </Container>
     )

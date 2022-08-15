@@ -11,7 +11,7 @@ import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 import ReactTooltip from "react-tooltip";
-
+import defaultProfile from '../assets/defaultprofile.png'
 
 
 dotenv.config();
@@ -417,7 +417,8 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             </Modal>
             <PostDiv>
             <div className="left-side">
-                <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
+               {authorPic ? <img src={authorPic} alt="Imagem de perfil do usuário que publicou" /> 
+               : <img src={defaultProfile} alt="defultProfile" /> }
                 <span>
                     {liked ? (
                         <>
