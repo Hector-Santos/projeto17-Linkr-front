@@ -18,8 +18,23 @@ const Wrapper = styled.section`
     margin: 0 auto;
     margin-top: 140px;
     justify-content: center;
-
     
+
+    div > .title > img{
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        margin-right: 30px;
+        
+       
+    }
+
+    div > .title {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 0px;
+        height: 29px;
+    }
     @media only screen and (max-width: 640px) {
         width: 95%;
     }

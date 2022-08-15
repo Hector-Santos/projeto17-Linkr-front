@@ -6,7 +6,7 @@ import Login from "./Login.js"
 import Cadastro from "./Cadastro.js";
 import Timeline from "../components/Timeline.js";
 import HashtagPostsPage from "../components/HashtagPostsPage.js";
-import UserPosts from "../components/UserPosts.js";
+import UserPost from "../components/UserPosts.js";
 
 function App() {
   return (

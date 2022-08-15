@@ -12,11 +12,13 @@ import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 import ReactTooltip from "react-tooltip";
 
+
+
 dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const PostDiv = styled.div`
-    
+    max-width: 610px;
     display: flex;
     justify-content: flex-start;
     padding: 30px;
@@ -386,14 +388,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
     }
     async function redirectToUserPage(){
-        if(header){
-            try{
-            const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
-            console.log(user.data.id)
-            }catch(err){
-             console.log(err)
-            }
-        }
+        navigate(`/user/${authorId}`) 
     }
     return(
         <>

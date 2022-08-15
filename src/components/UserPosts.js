@@ -20,6 +20,7 @@ export default function UserPosts(){
 
     const { id: userId } = useParams();
     const [username, setUsername] = useState('');
+    const [profilePic, setProfilePic] = useState('')
 
     useEffect(()=>{
         ( ()=>{
@@ -33,7 +34,7 @@ export default function UserPosts(){
                     window.localStorage.setItem('token', token)
                 }
         })();
-    }, []);
+    }, [token]);
 
     useEffect(()=>{
 
@@ -43,6 +44,7 @@ export default function UserPosts(){
                 
                 const { data } = await axios.get(`${REACT_APP_API_URL}/users/${userId}`, header);
                 setUsername(data.username);
+                setProfilePic(data.pictureUrl)
 
             } catch (err) {
                 console.log(err);
@@ -58,7 +60,10 @@ export default function UserPosts(){
             <Header />
             <Wrapper >
                 <div>
+                    <div className="title">
+                    <img src={profilePic} alt="Imagem de perfil do usuário acessado" />
                     <PageTitle text={`${username}'s posts`} />
+                    </div>
                     <Posts />
                 </div>
                 <TrendingSidebar />
