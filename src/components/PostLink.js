@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import styled from "styled-components";
 import dotenv from 'dotenv';
 import { TokenContext } from "../context/TokenContext";
+import defaultlink from "../assets/defaultlink.png"
 dotenv.config();
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
@@ -110,7 +111,7 @@ export default function PostLink({ linkUrl, postId }){
 
         })();
 
-    }, [header]);
+    }, [header,metadata]);
 
     return(
         <LinkDiv>
@@ -121,7 +122,7 @@ export default function PostLink({ linkUrl, postId }){
                     {metadata.ogUrl ? metadata.ogUrl : linkUrl}
                 </a>
             </div>
-            <img src={metadata.image} alt="Imagem da postagem" />
+            { metadata.image? <img src={metadata.image} alt="Imagem da postagem" /> :  <img src={defaultlink} alt="defaultlink" /> }
         </LinkDiv>
     );
 

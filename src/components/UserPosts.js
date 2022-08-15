@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import PageTitle from "./PageTitle";
 import { Wrapper } from "./Timeline";
 import axios from "axios";
+import defaultProfile from '../assets/defaultprofile.png'
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -61,7 +62,8 @@ export default function UserPosts(){
             <Wrapper >
                 <div>
                     <div className="title">
-                    <img src={profilePic} alt="Imagem de perfil do usuário acessado" />
+                    {profilePic ? <img  src={profilePic} alt="Imagem de perfil do usuário que publicou" /> 
+                 : <img src={defaultProfile} alt="default profile" /> }
                     <PageTitle text={`${username}'s posts`} />
                     </div>
                     <Posts />
