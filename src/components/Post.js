@@ -303,46 +303,57 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         })()},[token,liked, header, postId]);
 
     function likePost(){
+
         const body = {
             postId:postId
         }
        
-    if(liked){
-        if(token){
-        console.log(header)
-        let promise = axios.delete(`${REACT_APP_API_URL}/likedPosts`,{headers:{Authorization:token},data:{"postId":postId}})
-        promise.then(()=>{
-        setLiked(false)
-        setThisLikes(thisLikes - 1)
-        })
-        promise.catch(error =>{
-            console.log(error)
-        })
-        promise = axios.put(`${REACT_APP_API_URL}/posts/subtract`, body , header)
-        promise.then()
-        promise.catch(error =>{
-            console.log(error)
-        })
-    }
-    }else{
+        if(liked){
+            if(token){
 
-        if(token){
-            console.log(body)
-        let promise = axios.post(`${REACT_APP_API_URL}/likedPosts`, body , header)
-        promise.then(()=>{
-            setLiked(true)
-            setThisLikes(thisLikes + 1)
-            })
-        promise.catch(error =>{
-            console.log(error)
-        })
-        promise = axios.put(`${REACT_APP_API_URL}/posts/add`, body , header)
-        promise.then()
-        promise.catch(error =>{
-            console.log(error)
-        })
-    }
-    }
+                console.log(header);
+                let promise = axios.delete(`${REACT_APP_API_URL}/likedPosts`,{headers:{Authorization:token},data:{"postId":postId}});
+
+                promise.then(()=>{
+                    setLiked(false);
+                    setThisLikes(Number(thisLikes) - 1);
+                });
+
+                promise.catch(error =>{
+                    console.log(error);
+                });
+
+                promise = axios.put(`${REACT_APP_API_URL}/posts/subtract`, body , header);
+                promise.then();
+                promise.catch(error =>{
+                    console.log(error);
+                });
+            }
+        } else {
+
+            if(token){
+
+                console.log(body);
+                let promise = axios.post(`${REACT_APP_API_URL}/likedPosts`, body , header);
+
+                promise.then(()=>{
+                    setLiked(true);
+                    setThisLikes(Number(thisLikes) + 1);
+                });
+
+                promise.catch(error =>{
+                    console.log(error);
+                });
+
+                promise = axios.put(`${REACT_APP_API_URL}/posts/add`, body , header);
+
+                promise.then();
+
+                promise.catch(error =>{
+                    console.log(error);
+                });
+            }
+        }
         
     }
 
@@ -386,6 +397,82 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
     }
 
+    async function updateLikesInfo(){
+
+        if(!header) return;
+
+        try {
+            
+            const { data: lastLikes } = await axios.get(`${REACT_APP_API_URL}/posts/${postId}/last-likes`, header);
+            
+            const validLikes = lastLikes.filter(item => item.user.username != null);
+            
+            if(validLikes.length === 0){
+
+                setLikesInfo('Ninguém curtiu este post ainda');
+                return;
+
+            }
+
+            
+            const userLiked = validLikes.some(item => (item.user.id === loggedUser));
+            const lastItem = validLikes.find(item => (item.user.id && item.user.id !== loggedUser));
+            
+            if(validLikes.length === 1){
+
+                if(userLiked){
+
+                    const msg = `
+                        You liked this post.
+                    `;
+                    setLikesInfo(msg);
+
+                } else {
+
+                    const msg = `
+                        ${validLikes[0].user.username} liked this post.
+                    `;
+                    setLikesInfo(msg);
+
+                }
+
+                ReactTooltip.rebuild();
+                return;
+
+            }
+    
+            if(userLiked){
+
+                const remaining = Number(thisLikes) - 2;
+
+                const msg = `
+                    You, ${lastItem.user.username} ${remaining > 0 ? `and other ${remaining} people` : 'liked this post'}.
+                `;
+                setLikesInfo(msg);
+                ReactTooltip.rebuild();
+
+            } else {
+
+                const remaining = Number(thisLikes) - 2;
+
+                const msg = `
+                    ${validLikes[0].user.username}, ${validLikes[1].user.username} ${remaining > 0 ? `and other ${remaining} people` : 'liked this post'}.
+                `;
+
+                setLikesInfo(msg);
+                ReactTooltip.rebuild();
+
+            }
+
+        } catch (err) {
+            console.log(err);
+            alert('An error occured while trying to fetch the info of the posts');
+        }
+
+    }
+
+    updateLikesInfo();
+
     return(
         <>
             <Modal
@@ -415,17 +502,19 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             <div className="left-side">
                 <img src={authorPic} alt="Imagem de perfil do usuário que publicou" />
                 <span>
-                    {liked ? (
-                        <>
-                            <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
-                            <ReactTooltip place="bottom" type="light" effect="solid" />
-                        </>
-                    ) : (
-                        <>
-                            <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
-                            <ReactTooltip place="bottom" type="light" effect="solid" />
-                        </>
-                    )}
+                    {
+                        liked ? (
+                            <>
+                                <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
+                                <ReactTooltip place="bottom" type="light" effect="float" />
+                            </>
+                        ) : (
+                            <>
+                                <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
+                                <ReactTooltip place="bottom" type="light" effect="float" />
+                            </>
+                        )
+                    }
                 </span>
                 <p>{formatLikes(thisLikes) } Likes</p>
             </div>
