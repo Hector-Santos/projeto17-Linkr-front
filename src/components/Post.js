@@ -12,11 +12,13 @@ import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 import ReactTooltip from "react-tooltip";
 
+
+
 dotenv.config();
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const PostDiv = styled.div`
-    
+    max-width: 610px;
     display: flex;
     justify-content: flex-start;
     padding: 30px;
@@ -473,6 +475,11 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
     updateLikesInfo();
 
+
+    async function redirectToUserPage(){
+        navigate(`/user/${authorId}`) 
+    }
+
     return(
         <>
             <Modal
@@ -520,7 +527,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             </div>
                 <div className="post-info">
                     <span>
-                        <h3>{authorUsename}</h3>
+                        <h3 onClick={redirectToUserPage}>{authorUsename}</h3>
                         
                         <EditButtons />
                     </span>
