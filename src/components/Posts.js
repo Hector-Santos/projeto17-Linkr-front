@@ -31,7 +31,31 @@ const CenteredDiv = styled.div`
 `;
 
 
-function getPosts(loading, posts, loggedUser){
+function getPosts(loading, posts, loggedUser, following = null){
+
+    console.log('following ', following);
+
+    if(following !== null && following !== undefined){
+
+        if(following === 0){
+
+            return (
+                <CenteredDiv>
+                    <p>You don't follow anyone yet. Search for new friends!</p>
+                </CenteredDiv>
+            );
+
+        } else if(posts.length === 0) {
+
+            return (
+                <CenteredDiv>
+                    <p>No posts found from your friends</p>
+                </CenteredDiv>
+            );
+
+        }
+
+    }
 
     if(loading) return (
         <CenteredDiv>
@@ -63,6 +87,7 @@ export default function Posts(){
     const [loggedUser, setLoggedUser] = useState("");
     const {header} = useContext(TokenContext);
     const { id: userId } = useParams();
+    const [following, setFollowing] = useState(0);
 
     useEffect(()=>{
 
@@ -74,8 +99,10 @@ export default function Posts(){
 
                 const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}` : `${REACT_APP_API_URL}/timeline`;
                 
-                 const { data } =  await axios.get(requestUrl, header) ;
-                setPosts(data);
+                const { data } =  await axios.get(requestUrl, header);
+                const { posts, followingCount } = data;
+                setPosts(posts);
+                setFollowing(followingCount);
                 setLoading(false);
 
             } catch (err) {
@@ -101,7 +128,7 @@ export default function Posts(){
 
     return(
         <PostsDiv>
-            {getPosts(loading, posts, loggedUser)}
+            {getPosts(loading, posts, loggedUser, following)}
         </PostsDiv>
     );
 
