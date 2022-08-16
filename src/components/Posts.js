@@ -6,6 +6,7 @@ import styled from "styled-components";
 import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
+import useInterval from 'use-interval';
 
 dotenv.config();
 
@@ -56,13 +57,23 @@ function getPosts(loading, posts, loggedUser){
 
 }
 
+
+
+
 export default function Posts(){
 
     const [posts, setPosts] = useState([]);
+    const [newPosts, setNewPosts] = useState(0);
     const [loading, setLoading] = useState(true);
     const [loggedUser, setLoggedUser] = useState("");
     const {header} = useContext(TokenContext);
     const { id: userId } = useParams();
+
+    useInterval(() => {
+        
+        setNewPosts(newPosts + 1)
+        console.log(newPosts) 
+      }, 5000);
 
     useEffect(()=>{
 
