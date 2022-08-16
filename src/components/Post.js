@@ -62,6 +62,7 @@ const PostDiv = styled.div`
         display: flex;
         justify-content: space-between;
         width: 100%;
+        margin-bottom: 7px;
     }
 
     .post-info > h3 {
@@ -197,6 +198,8 @@ const EditContainer = styled.textarea`
 `;
 
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
+
+    console.log({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser});
 
     const navigate = useNavigate();
     const [liked, setLiked] = useState(false)
@@ -361,8 +364,6 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
     function formatPostContent(){
 
-        const formattedHashtags = [...hashtags].filter(hashtag => hashtag !== '').map(hashtag => `#${hashtag}`);
-
         return(
             <>
                 {enableEdit ? (
@@ -383,13 +384,10 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     ></EditContainer>
                 ) : (
                     <p>
-                    {postContent}
                         <ReactTagify 
                             colors={"white"}
                             tagClicked={goToHashtag}>
-                            <span>
-                                {formattedHashtags.join(' ')}
-                            </span>
+                            {postContent}
                         </ReactTagify>
                     </p>
                 )}

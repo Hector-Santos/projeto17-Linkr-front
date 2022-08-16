@@ -53,7 +53,7 @@ export default function TrendingSidebar(){
 
         const validHashtags = [...hashtags].filter(hashtag => hashtag !== '');
 
-        validHashtags.sort((a, b) => a.count - b.count);
+        validHashtags.sort((a, b) => b.count - a.count);
         return validHashtags.map(hashtag => <TrendingHashtag name={hashtag.name} />)
 
     }

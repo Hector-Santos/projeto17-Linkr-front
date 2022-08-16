@@ -73,8 +73,6 @@ export default function Posts(){
                 if(!header) return;
 
                 const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}` : `${REACT_APP_API_URL}/timeline`;
-
-                console.log('requestUrl ----', requestUrl, userId);
                 
                  const { data } =  await axios.get(requestUrl, header) ;
                 setPosts(data);
