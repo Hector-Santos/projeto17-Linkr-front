@@ -32,6 +32,14 @@ export default function NewPost(){
            }
         })()},[header, profilePic]);
 
+    function getHashtagsFromContent(str){
+        const hashtags = str.match(/#\w+/g);
+            if(hashtags){
+            return hashtags.map(hashtag => hashtag.slice(1));
+        }
+        return [];
+    }
+
     
     function submitPost(event) {
         event.preventDefault()
@@ -40,8 +48,9 @@ export default function NewPost(){
         setColorInput("#AFAFAF")
         setBotao(<ThreeDots color="white" height={80} width={80} />)
         let body = {
-            link:link,
-            content:content
+            link,
+            content,
+            hashtags: getHashtagsFromContent(content)
         }
         function hashtag(str){
             const hashtags = str.match(/#\w+/g);
