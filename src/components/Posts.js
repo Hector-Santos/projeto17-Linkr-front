@@ -193,7 +193,7 @@ export default function Posts(){
        </RefreshButton> : <Spacer/>}
         
         <PostsDiv>
-            {getPosts(loading, posts, loggedUser, following)}
+            {getPosts(loading, posts, loggedUser)}
         </PostsDiv>
         </>
     );  
