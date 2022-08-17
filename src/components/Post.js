@@ -314,13 +314,13 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         })()
     }, [header, postId, token])
 
-    function getComments(comments) {
+    function getComments(comments, authorId) {
                
-        const commentsList = comments.map(comment => <Comments author={comment.userId} content={comment.content} />);
+        const commentsList = comments.map(comment => <Comments commentAuthor={comment.userId} content={comment.content} postAuthor={authorId}/>);
         return commentsList;
     }
 
-    const toggle = () => {
+    const toggleComments = () => {
         if (showComments === false) {
             setShowComments(true);
         } else {
@@ -562,7 +562,9 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                         <p>{formatLikes(thisLikes) } Likes</p>
 
                         <span>
-                            <AiOutlineComment onClick={toggle}/>
+                            <AiOutlineComment cursor="pointer"
+                                onClick={() => toggleComments(postId, setComments, token)}
+                            />
                         </span>
                         <p>{comments.length} comments</p>
                     </div>
@@ -582,7 +584,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     </div>
                 </div>
                 {showComments
-                    ? <div className="comments">{getComments(comments)}</div>
+                    ? <div className="comments">{getComments(comments, authorId)}</div>
                     : <></>
                 }
                 

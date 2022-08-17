@@ -1,9 +1,13 @@
-export default function Comments({ author, content }) {
+export default function Comments({ commentAuthor, content, postAuthor }) {
 
-    console.log({ author, content })
+    console.log({ commentAuthor, content, postAuthor })
     return(
         <>
-            <h3>{author}</h3>
+            {commentAuthor === postAuthor
+                ? <h3>{commentAuthor}  • post's author</h3>
+                : <h3>{commentAuthor}</h3>
+            }
+            
             <p>{content}</p>
         </>
     )    
