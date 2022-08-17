@@ -21,7 +21,8 @@ export default function UserPosts(){
 
     const { id: userId } = useParams();
     const [username, setUsername] = useState('');
-    const [profilePic, setProfilePic] = useState('')
+    const [profilePic, setProfilePic] = useState('');
+    const [loggedUser, setLoggedUser] = useState(null);
 
     useEffect(()=>{
         ( ()=>{
@@ -36,6 +37,26 @@ export default function UserPosts(){
                 }
         })();
     }, [token]);
+
+    useEffect(() => {
+
+        (async ()=>{
+
+            if(!header) return;
+
+            try {
+             
+                const response = await axios.get(`${REACT_APP_API_URL}/users`, header);
+                setLoggedUser(response.data);
+
+            } catch (err) {
+                console.error(err);
+                alert('Ocorreu um erro ao buscar suas informações.');
+            }
+
+        })();
+
+    }, [header]);
 
     useEffect(()=>{
 
@@ -68,7 +89,7 @@ export default function UserPosts(){
                     </div>
                     <Posts />
                 </div>
-                <TrendingSidebar />
+                <TrendingSidebar showButton={true} idFromUserPage={userId} loggedUser={loggedUser} />
             </Wrapper>
         </>
 
