@@ -33,8 +33,6 @@ const CenteredDiv = styled.div`
 
 function getPosts(loading, posts, loggedUser, following = null){
 
-    console.log('following ', following);
-
     if(following !== null && following !== undefined){
 
         if(following === 0){
