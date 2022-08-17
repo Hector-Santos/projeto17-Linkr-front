@@ -1,11 +1,13 @@
 import axios from "axios";
 import { useEffect, useState, useContext } from "react";
 import Post from "./Post";
+import {BiRefresh} from "react-icons/bi"
 import dotenv from 'dotenv';
 import styled from "styled-components";
 import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
+import useInterval from 'use-interval';
 
 dotenv.config();
 
@@ -30,33 +32,64 @@ const CenteredDiv = styled.div`
     margin: 30px 0;
 `;
 
+const RefreshButton = styled.div`
+display: flex;
+align-items: center;
+justify-content: center;
 
-function getPosts(loading, posts, loggedUser, following = null){
+height: 61px;
+width: 611px;
+border-radius: 16px;
+background-color: #1877F2;
+margin-top: 40px;
+margin-bottom: 20px;
 
-    console.log('following ', following);
+h1{
+    font-size: 16px;
+    margin-right: 10px;
+    font-weight: bold;
+    font-family: 'Lato', sans-serif;
+}
 
-    if(following !== null && following !== undefined){
+h2{
+    margin-top: 5px;
+    font-size: 20px;
+    color: #ffffff;
+}
+`
+const Spacer = styled.div`
+height: 40px;
+;
+`
 
-        if(following === 0){
 
-            return (
-                <CenteredDiv>
-                    <p>You don't follow anyone yet. Search for new friends!</p>
-                </CenteredDiv>
-            );
+// function getPosts(loading, posts, loggedUser, following = null){
 
-        } else if(posts.length === 0) {
+//     console.log('following ', following);
 
-            return (
-                <CenteredDiv>
-                    <p>No posts found from your friends</p>
-                </CenteredDiv>
-            );
+//     if(following !== null && following !== undefined){
 
-        }
+//         if(following === 0){
 
-    }
+//             return (
+//                 <CenteredDiv>
+//                     <p>You don't follow anyone yet. Search for new friends!</p>
+//                 </CenteredDiv>
+//             );
 
+//         } else if(posts.length === 0) {
+
+//             return (
+//                 <CenteredDiv>
+//                     <p>No posts found from your friends</p>
+//                 </CenteredDiv>
+//             );
+
+//         }
+
+//     }
+
+function getPosts(loading, posts, loggedUser){
     if(loading) return (
         <CenteredDiv>
             <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
@@ -80,9 +113,16 @@ function getPosts(loading, posts, loggedUser, following = null){
 
 }
 
+
+
+
+
+
 export default function Posts(){
 
     const [posts, setPosts] = useState([]);
+    const [reload, setReload] = useState(1)
+    const [newPosts, setNewPosts] = useState(0);
     const [loading, setLoading] = useState(true);
     const [loggedUser, setLoggedUser] = useState("");
     const {header} = useContext(TokenContext);
@@ -92,7 +132,7 @@ export default function Posts(){
     useEffect(()=>{
 
         (async ()=>{
-
+          
             try {
 
                 if(!header) return;
@@ -112,7 +152,8 @@ export default function Posts(){
 
         })();
 
-    }, [header, userId]);
+    }, [header, userId, reload]);
+
 
     useEffect(() => {
         const REACT_APP_API_URL = process.env.REACT_APP_API_URL; 
@@ -126,11 +167,36 @@ export default function Posts(){
         })
     }, [header])
 
+    useInterval( async () => {
+        try{
+        if(posts && !userId && header){
+        
+        const { data } =  await axios.get(`${REACT_APP_API_URL}/timeline`, header)
+       
+        if(data[0].id >= posts[0].id) setNewPosts(data[0].id - posts[0].id)
+        }
+     } catch (err) {
+        console.log(err);
+        alert('An error occured while trying to fetch the posts, please refresh the page');
+    }
+      }, 15000);
+    function setreload(){
+         setReload(reload +1)
+         setNewPosts(0) 
+    }
     return(
+        <>
+        {newPosts? 
+       <RefreshButton onClick={()=> {setreload()}}>
+        <h1>{`${newPosts} new posts, load more!`}</h1>
+        <h2>{<BiRefresh/>}</h2>
+       </RefreshButton> : <Spacer/>}
+        
         <PostsDiv>
             {getPosts(loading, posts, loggedUser, following)}
         </PostsDiv>
-    );
+        </>
+    );  
 
 };
 

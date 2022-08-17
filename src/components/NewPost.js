@@ -52,7 +52,13 @@ export default function NewPost(){
             content,
             hashtags: getHashtagsFromContent(content)
         }
-        
+        function hashtag(str){
+            const hashtags = str.match(/#\w+/g);
+              if(hashtags){
+                return hashtags.map(hashtag => hashtag.slice(1));
+              }
+              return [];
+          }
         let promise = axios.post(`${REACT_APP_API_URL}/posts`, body, header)
         promise.then((response => {
            

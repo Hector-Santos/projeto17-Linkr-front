@@ -24,7 +24,7 @@ const PostDiv = styled.div`
     padding: 30px;
     box-sizing: border-box;
     background-color: #171717;
-    margin: 40px auto;
+    margin: auto auto 40px;
     border-radius: 16px;
 
     .left-side > img {
