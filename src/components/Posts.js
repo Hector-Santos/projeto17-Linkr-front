@@ -62,34 +62,30 @@ height: 40px;
 ;
 `
 
+function getPosts(loading, posts, loggedUser, following = null){
 
-// function getPosts(loading, posts, loggedUser, following = null){
+    if(following !== null && following !== undefined){
 
-//     console.log('following ', following);
+        if(following === 0){
 
-//     if(following !== null && following !== undefined){
+            return (
+                <CenteredDiv>
+                    <p>You don't follow anyone yet. Search for new friends!</p>
+                </CenteredDiv>
+            );
 
-//         if(following === 0){
+        } else if(posts.length === 0) {
 
-//             return (
-//                 <CenteredDiv>
-//                     <p>You don't follow anyone yet. Search for new friends!</p>
-//                 </CenteredDiv>
-//             );
+            return (
+                <CenteredDiv>
+                    <p>No posts found from your friends</p>
+                </CenteredDiv>
+            );
 
-//         } else if(posts.length === 0) {
+        }
 
-//             return (
-//                 <CenteredDiv>
-//                     <p>No posts found from your friends</p>
-//                 </CenteredDiv>
-//             );
+    }
 
-//         }
-
-//     }
-
-function getPosts(loading, posts, loggedUser){
     if(loading) return (
         <CenteredDiv>
             <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
@@ -112,11 +108,6 @@ function getPosts(loading, posts, loggedUser){
     }
 
 }
-
-
-
-
-
 
 export default function Posts(){
 
