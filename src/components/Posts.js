@@ -162,9 +162,10 @@ export default function Posts(){
         try{
         if(posts && !userId && header){
         
-        const { data } =  await axios.get(`${REACT_APP_API_URL}/timeline`, header)
+        const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline`, header)
+
        
-        if(data[0].id >= posts[0].id) setNewPosts(data[0].id - posts[0].id)
+        if(data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
         }
      } catch (err) {
         console.log(err);
@@ -184,7 +185,7 @@ export default function Posts(){
        </RefreshButton> : <Spacer/>}
         
         <PostsDiv>
-            {getPosts(loading, posts, loggedUser, following)}
+            {getPosts(loading, posts, loggedUser)}
         </PostsDiv>
         </>
     );  
