@@ -199,8 +199,6 @@ const EditContainer = styled.textarea`
 
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
-    console.log({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser});
-
     const navigate = useNavigate();
     const [liked, setLiked] = useState(false)
     const [thisLikes, setThisLikes] = useState(likes)
