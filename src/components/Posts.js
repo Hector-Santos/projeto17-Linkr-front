@@ -163,7 +163,7 @@ export default function Posts(){
         if(posts && !userId && header){
         
         const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline`, header)
-        console.log(data.posts)
+
        
         if(data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
         }
