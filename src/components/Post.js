@@ -1,12 +1,13 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
-import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit, AiOutlineComment } from "react-icons/ai";
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
+import Comments from "./Comments";
 import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
@@ -20,12 +21,20 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 const PostDiv = styled.div`
     max-width: 610px;
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
-    padding: 30px;
+    
     box-sizing: border-box;
-    background-color: #171717;
+    background: #1E1E1E;
     margin: auto auto 40px;
     border-radius: 16px;
+
+    .post-proper {
+        display: flex;
+        background-color: #171717;
+        padding: 30px;
+        border-radius: 16px;
+    }
 
     .left-side > img {
         border-radius: 50%;
@@ -197,6 +206,11 @@ const EditContainer = styled.textarea`
     }
 `;
 
+const CommentContainer = styled.div`
+    background: #1E1E1E;
+    border-radius: 16px;
+`
+
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
     const navigate = useNavigate();
@@ -209,6 +223,8 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
     const [loadDelete, setLoadDelete] = useState(false);
     const [loadEdit, setLoadEdit] = useState(false);
     const [newContent, setNewContent] = useState(postContent);
+    const [comments, setComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
     const element = useRef("");
 
     Modal.setAppElement('*')
@@ -252,7 +268,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
     async function editPost(e) {
         e.preventDefault();
-        const data = { content: newContent};
+        const data = { content: newContent };
         setLoadEdit(true);
         
         try{
@@ -289,6 +305,41 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
         navigate(`/hashtag/${hashtagName.replace(/#/gi, "")}`);
 
+    }
+
+    useEffect(() => {
+        ( async () => {
+            if (token) {
+                let promise = axios.get(`${REACT_APP_API_URL}/comments/${postId}`, header)
+                promise.then((response => {
+                    setComments(response.data)
+                }))
+                promise.catch(error => {
+                    console.log(error)
+                })
+            }
+        })()
+    }, [header, postId, token])
+
+    function getComments(comments) {
+               
+        const commentsList = comments.map(comment => 
+            <Comments 
+                commentAuthor={comment.username} 
+                commentAuthorPic={comment.pictureUrl} 
+                content={comment.content} 
+                postAuthor={comment.postAuthor}
+                following={comment.following}
+            />);
+        return commentsList;
+    }
+
+    const toggleComments = () => {
+        if (showComments === false) {
+            setShowComments(true);
+        } else {
+            setShowComments(false);
+        }
     }
     
     useEffect(()=>{
@@ -502,41 +553,57 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 )}
             </Modal>
             <PostDiv>
-            <div className="left-side">
-               {authorPic ? <img src={authorPic} alt="Imagem de perfil do usuário que publicou" /> 
-               : <img src={defaultProfile} alt="defultProfile" /> }
-                <span>
-                    {
-                        liked ? (
-                            <>
-                                <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
-                                <ReactTooltip place="bottom" type="light" effect="float" />
-                            </>
-                        ) : (
-                            <>
-                                <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
-                                <ReactTooltip place="bottom" type="light" effect="float" />
-                            </>
-                        )
-                    }
-                </span>
-                <p>{formatLikes(thisLikes) } Likes</p>
-            </div>
-                <div className="post-info">
-                    <span>
-                        <h3 onClick={redirectToUserPage}>{authorUsename}</h3>
-                        
-                        <EditButtons />
-                    </span>
+                <div className="post-proper">
+                    <div className="left-side">
+                        {authorPic  
+                            ? <img src={authorPic} alt="Imagem de perfil do usuário que publicou" /> 
+                            : <img src={defaultProfile} alt="defultProfile" /> }
+                        <span>
+                            {
+                                liked ? (
+                                    <>
+                                        <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
+                                        <ReactTooltip place="bottom" type="light" effect="float" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
+                                        <ReactTooltip place="bottom" type="light" effect="float" />
+                                    </>
+                                )
+                            }
+                        </span>
+                        <p>{formatLikes(thisLikes) } Likes</p>
 
-                    {formatPostContent()}
-
-                    <div className="links">
-                        <PostLink linkUrl={link} postId={postId} />
+                        <span>
+                            <AiOutlineComment cursor="pointer"
+                                onClick={() => toggleComments(postId, setComments, token)}
+                            />
+                        </span>
+                        {comments.length === 1
+                            ? <p>{comments.length} comment</p>
+                            : <p>{comments.length} comments</p>
+                        }
                     </div>
+                    <div className="post-info">
+                        <span>
+                            <h3 onClick={redirectToUserPage}>{authorUsename}</h3>
+                            
+                            <EditButtons />
+                        </span>
 
+                        {formatPostContent()}
+
+                        <div className="links">
+                            <PostLink linkUrl={link} postId={postId} />
+                        </div>
+
+                    </div>
                 </div>
-
+                {showComments
+                    ? <CommentContainer>{getComments(comments)}</CommentContainer>
+                    : <></>
+                }
             </PostDiv>
         </>
 
