@@ -2,9 +2,9 @@ import styled from "styled-components";
 
 import defaultProfile from '../assets/defaultprofile.png'
 
-export default function Comments({ commentAuthor, commentAuthorPic, content, postAuthor }) {
+export default function Comments({ commentAuthor, commentAuthorPic, content, postAuthor, following }) {
 
-    console.log({ commentAuthor, commentAuthorPic, content, postAuthor })
+    console.log({ commentAuthor, commentAuthorPic, content, postAuthor, following })
     return(
         <CommentContainer>
             <div className="image">
@@ -13,11 +13,18 @@ export default function Comments({ commentAuthor, commentAuthorPic, content, pos
                                 : <img src={defaultProfile} alt="defultProfile" /> } 
                 
             </div>
-            <div className="text">
-                {postAuthor
-                    ? <h3>{commentAuthor} <span>• post's author</span></h3>
-                    : <h3>{commentAuthor}</h3>
-                }
+            <div>
+                <div className="header">
+                    <h3>{commentAuthor} </h3>
+                    {postAuthor
+                        ? <h2>• post's author</h2>
+                        : ""
+                    }
+                    {following
+                        ? <h2>• following</h2>
+                        : ""
+                    }
+                </div>
                 <p>{content}</p>
             </div>
         </CommentContainer>
@@ -29,6 +36,10 @@ const CommentContainer = styled.div`
     padding: 15px 25px;
     display: flex;
     align-items: center;
+
+    .header {
+        display: flex;
+    }
 
     img {
         border-radius: 50%;
@@ -46,19 +57,19 @@ const CommentContainer = styled.div`
         color: #F3F3F3;
     }
 
+    h2 {
+        font-family: 'Lato';
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+        color: #565656;
+    }
+
     p {
         font-family: 'Lato';
         font-weight: 400;
         font-size: 14px;
         line-height: 17px;
         color: #ACACAC;
-    }
-
-    span {
-        font-family: 'Lato';
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 17px;
-        color: #565656;
     }
 `

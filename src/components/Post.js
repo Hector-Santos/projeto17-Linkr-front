@@ -329,6 +329,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 commentAuthorPic={comment.pictureUrl} 
                 content={comment.content} 
                 postAuthor={comment.postAuthor}
+                following={comment.following}
             />);
         return commentsList;
     }
