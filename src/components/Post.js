@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
 import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit, AiOutlineComment } from "react-icons/ai";
+import { IoPaperPlaneOutline } from "react-icons/io5"
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
@@ -208,7 +209,55 @@ const EditContainer = styled.textarea`
 
 const CommentContainer = styled.div`
     background: #1E1E1E;
-    border-radius: 16px;
+    border-radius: 0 0 16px 16px;
+    margin: 0 5px;
+    padding: 0 20px;
+    
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        margin: 19px 0;
+
+        img {
+            width: 39px;
+            height: 39px;
+            border-radius: 50%;
+            margin-right: 14px;
+        }
+
+        button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #252525;
+            border-radius: 0 8px 8px 0;
+            border: none;
+        }
+    }
+
+    input {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        height: 39px;
+        background: #252525;
+        border-radius: 8px 0 0 8px;
+        border: none;
+        font-size: 14px;
+        line-height: 17px;
+        letter-spacing: 0.05em;
+        padding: 0 15px;
+        color: #FFFFFF;
+        outline: none;
+
+        &::placeholder {
+            font-style: italic;
+            color: #575757;
+        }
+    }
+
 `
 
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
@@ -224,7 +273,10 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
     const [loadEdit, setLoadEdit] = useState(false);
     const [newContent, setNewContent] = useState(postContent);
     const [comments, setComments] = useState([]);
+    const [comment, setComment] = useState("");
     const [showComments, setShowComments] = useState(false);
+    const [profilePic, setProfilePic] = useState();
+
     const element = useRef("");
 
     Modal.setAppElement('*')
@@ -246,10 +298,34 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         }
     }
 
+    useEffect(()=>{
+        ( async ()=>{
+           if(header){
+           const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
+           setProfilePic(user.data.pictureUrl)
+           }
+        })()
+    },[profilePic,REACT_APP_API_URL, header]);
+
     function refreshPage() {
         window.location.reload(false);
     }
 
+    async function addComment() {
+        if (comment === "") return;
+        const data = { content: comment };
+
+        try {
+            await axios.post(`${REACT_APP_API_URL}/comments/${postId}`, data, header);
+        } catch (error) {
+            console.log(error);
+            alert("Error: cannot add comment.");
+            refreshPage();
+        }
+        setComment("");
+        refreshPage();
+    }
+    
     async function deletePost(e) {
         e.preventDefault();
         setLoadDelete(true);
@@ -321,7 +397,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         })()
     }, [header, postId, token])
 
-    function getComments(comments) {
+    function getComments(comments, loggedUser) {
                
         const commentsList = comments.map(comment => 
             <Comments 
@@ -329,7 +405,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 commentAuthorPic={comment.pictureUrl} 
                 content={comment.content} 
                 postAuthor={comment.postAuthor}
-                following={comment.following}
+                currentUser={loggedUser}
             />);
         return commentsList;
     }
@@ -601,7 +677,27 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     </div>
                 </div>
                 {showComments
-                    ? <CommentContainer>{getComments(comments)}</CommentContainer>
+                    ? <CommentContainer>
+                        {getComments(comments, loggedUser)}
+                        <form onSubmit={addComment}>
+                            <img src={profilePic} />
+                            <input 
+                                type="text" 
+                                placeholder="write a comment..." 
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+                            <button type="submit">
+                                <IoPaperPlaneOutline
+                                    style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        color: "#FFFFFF"
+                                    }}
+                                />
+                            </button>
+                        </form>
+                    </CommentContainer>
                     : <></>
                 }
             </PostDiv>
