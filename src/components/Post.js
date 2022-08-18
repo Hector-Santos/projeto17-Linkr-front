@@ -21,15 +21,19 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 const PostDiv = styled.div`
     max-width: 610px;
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
-    padding: 30px;
+    
     box-sizing: border-box;
-    background-color: #171717;
+    background: #1E1E1E;
     margin: auto auto 40px;
     border-radius: 16px;
 
-    .comments {
-
+    .post-proper {
+        display: flex;
+        background-color: #171717;
+        padding: 30px;
+        border-radius: 16px;
     }
 
     .left-side > img {
@@ -202,6 +206,11 @@ const EditContainer = styled.textarea`
     }
 `;
 
+const CommentContainer = styled.div`
+    background: #1E1E1E;
+    border-radius: 16px;
+`
+
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
 
     const navigate = useNavigate();
@@ -312,9 +321,15 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         })()
     }, [header, postId, token])
 
-    function getComments(comments, authorId) {
+    function getComments(comments) {
                
-        const commentsList = comments.map(comment => <Comments commentAuthor={comment.userId} content={comment.content} postAuthor={authorId}/>);
+        const commentsList = comments.map(comment => 
+            <Comments 
+                commentAuthor={comment.username} 
+                commentAuthorPic={comment.pictureUrl} 
+                content={comment.content} 
+                postAuthor={comment.postAuthor}
+            />);
         return commentsList;
     }
 
@@ -564,7 +579,10 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                                 onClick={() => toggleComments(postId, setComments, token)}
                             />
                         </span>
-                        <p>{comments.length} comments</p>
+                        {comments.length === 1
+                            ? <p>{comments.length} comment</p>
+                            : <p>{comments.length} comments</p>
+                        }
                     </div>
                     <div className="post-info">
                         <span>
@@ -582,11 +600,9 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     </div>
                 </div>
                 {showComments
-                    ? <div className="comments">{getComments(comments, authorId)}</div>
+                    ? <CommentContainer>{getComments(comments)}</CommentContainer>
                     : <></>
                 }
-                
-            
             </PostDiv>
         </>
 
