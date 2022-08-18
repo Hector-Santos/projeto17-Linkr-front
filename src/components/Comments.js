@@ -28,7 +28,7 @@ export default function Comments({ commentAuthor, commentAuthorPic, content, pos
 
 const CommentContainer = styled.div`
     border-bottom: 1px solid #353535;
-    padding: 15px 25px;
+    padding: 15px 0;
     display: flex;
     align-items: center;
 
@@ -38,8 +38,8 @@ const CommentContainer = styled.div`
 
     img {
         border-radius: 50%;
-        width: 48px;
-        height: 48px;
+        width: 39px;
+        height: 39px;
         margin-right: 20px;
     }
 

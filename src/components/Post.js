@@ -209,7 +209,55 @@ const EditContainer = styled.textarea`
 
 const CommentContainer = styled.div`
     background: #1E1E1E;
-    border-radius: 16px;
+    border-radius: 0 0 16px 16px;
+    margin: 0 5px;
+    padding: 0 20px;
+    
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        margin: 19px 0;
+
+        img {
+            width: 39px;
+            height: 39px;
+            border-radius: 50%;
+            margin-right: 14px;
+        }
+
+        button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #252525;
+            border-radius: 0 8px 8px 0;
+            border: none;
+        }
+    }
+
+    input {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        height: 39px;
+        background: #252525;
+        border-radius: 8px 0 0 8px;
+        border: none;
+        font-size: 14px;
+        line-height: 17px;
+        letter-spacing: 0.05em;
+        padding: 0 15px;
+        color: #FFFFFF;
+        outline: none;
+
+        &::placeholder {
+            font-style: italic;
+            color: #575757;
+        }
+    }
+
 `
 
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
@@ -227,6 +275,8 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState("");
     const [showComments, setShowComments] = useState(false);
+    const [profilePic, setProfilePic] = useState();
+
     const element = useRef("");
 
     Modal.setAppElement('*')
@@ -247,6 +297,15 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             transform: 'translate(-50%, -50%)'   
         }
     }
+
+    useEffect(()=>{
+        ( async ()=>{
+           if(header){
+           const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
+           setProfilePic(user.data.pictureUrl)
+           }
+        })()
+    },[profilePic,REACT_APP_API_URL, header]);
 
     function refreshPage() {
         window.location.reload(false);
@@ -620,18 +679,24 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 {showComments
                     ? <CommentContainer>
                         {getComments(comments, loggedUser)}
-                        <div>
+                        <form onSubmit={addComment}>
+                            <img src={profilePic} />
                             <input 
                                 type="text" 
                                 placeholder="write a comment..." 
                                 value={comment}
                                 onChange={(e) => setComment(e.target.value)}
                             />
-                            <IoPaperPlaneOutline 
-                                cursor="pointer"
-                                onClick={addComment}
-                            />
-                        </div>
+                            <button type="submit">
+                                <IoPaperPlaneOutline
+                                    style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        color: "#FFFFFF"
+                                    }}
+                                />
+                            </button>
+                        </form>
                     </CommentContainer>
                     : <></>
                 }
