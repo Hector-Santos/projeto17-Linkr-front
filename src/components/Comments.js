@@ -2,9 +2,8 @@ import styled from "styled-components";
 
 import defaultProfile from '../assets/defaultprofile.png'
 
-export default function Comments({ commentAuthor, commentAuthorPic, content, postAuthor, following }) {
-
-    console.log({ commentAuthor, commentAuthorPic, content, postAuthor, following })
+export default function Comments({ commentAuthor, commentAuthorPic, content, postAuthor, currentUser }) {
+    
     return(
         <CommentContainer>
             <div className="image">
@@ -18,10 +17,6 @@ export default function Comments({ commentAuthor, commentAuthorPic, content, pos
                     <h3>{commentAuthor} </h3>
                     {postAuthor
                         ? <h2>• post's author</h2>
-                        : ""
-                    }
-                    {following
-                        ? <h2>• following</h2>
                         : ""
                     }
                 </div>

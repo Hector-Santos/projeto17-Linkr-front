@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
 import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit, AiOutlineComment } from "react-icons/ai";
+import { IoPaperPlaneOutline } from "react-icons/io5"
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
@@ -224,6 +225,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
     const [loadEdit, setLoadEdit] = useState(false);
     const [newContent, setNewContent] = useState(postContent);
     const [comments, setComments] = useState([]);
+    const [comment, setComment] = useState("");
     const [showComments, setShowComments] = useState(false);
     const element = useRef("");
 
@@ -250,6 +252,21 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         window.location.reload(false);
     }
 
+    async function addComment() {
+        if (comment === "") return;
+        const data = { content: comment };
+
+        try {
+            await axios.post(`${REACT_APP_API_URL}/comments/${postId}`, data, header);
+        } catch (error) {
+            console.log(error);
+            alert("Error: cannot add comment.");
+            refreshPage();
+        }
+        setComment("");
+        refreshPage();
+    }
+    
     async function deletePost(e) {
         e.preventDefault();
         setLoadDelete(true);
@@ -321,7 +338,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         })()
     }, [header, postId, token])
 
-    function getComments(comments) {
+    function getComments(comments, loggedUser) {
                
         const commentsList = comments.map(comment => 
             <Comments 
@@ -329,7 +346,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 commentAuthorPic={comment.pictureUrl} 
                 content={comment.content} 
                 postAuthor={comment.postAuthor}
-                following={comment.following}
+                currentUser={loggedUser}
             />);
         return commentsList;
     }
@@ -601,7 +618,21 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     </div>
                 </div>
                 {showComments
-                    ? <CommentContainer>{getComments(comments)}</CommentContainer>
+                    ? <CommentContainer>
+                        {getComments(comments, loggedUser)}
+                        <div>
+                            <input 
+                                type="text" 
+                                placeholder="write a comment..." 
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+                            <IoPaperPlaneOutline 
+                                cursor="pointer"
+                                onClick={addComment}
+                            />
+                        </div>
+                    </CommentContainer>
                     : <></>
                 }
             </PostDiv>
