@@ -111,7 +111,7 @@ export default function PostLink({ linkUrl, postId }){
 
         })();
 
-    }, [header,metadata]);
+    }, [header]);
 
     return(
         <LinkDiv>
@@ -122,7 +122,7 @@ export default function PostLink({ linkUrl, postId }){
                     {metadata.ogUrl ? metadata.ogUrl : linkUrl}
                 </a>
             </div>
-            { metadata.image? <img src={metadata.image} alt="Imagem da postagem" /> :  <img src={defaultlink} alt="defaultlink" /> }
+             <img src={metadata.image? metadata.image : defaultlink} alt="Imagem da postagem" /> 
         </LinkDiv>
     );
 

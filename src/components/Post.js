@@ -25,7 +25,7 @@ const PostDiv = styled.div`
     padding: 30px;
     box-sizing: border-box;
     background-color: #171717;
-    margin: 40px auto;
+    margin: auto auto 40px;
     border-radius: 16px;
 
     .comments {
@@ -203,8 +203,6 @@ const EditContainer = styled.textarea`
 `;
 
 export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
-
-    console.log({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser});
 
     const navigate = useNavigate();
     const [liked, setLiked] = useState(false)

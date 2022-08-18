@@ -1,21 +1,19 @@
 import TrendingHashtag from "./TrendingHashtag";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import dotenv from 'dotenv';
+import { TokenContext } from "../context/TokenContext";
+import { ThreeDots } from 'react-loader-spinner';
 
 dotenv.config();
 
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const TrendingDiv = styled.div`
-    max-width: 300px;
     margin-top: 65px;
-    margin-left: 20px;
     background-color: #171717;
-    width: 300px;
     border-radius: 16px;
-    width: 65%;
     padding: 20px;
     height: fit-content;
     
@@ -45,9 +43,49 @@ const TrendingDiv = styled.div`
 
 `;
 
-export default function TrendingSidebar(){
+const RightSideWrapper = styled.div`
+
+    max-width: 300px;
+    margin-left: 20px;
+    width: 300px;
+    width: 65%;
+
+`;
+
+const FollowButton = styled.button`
+    float: right;
+    background-color: #1877F2;
+    color: #fff;
+    width: 112px;
+    height: 31px;
+    border-radius: 5px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+const UnfollowButton = styled.button`
+    float: right;
+    background-color: #fff;
+    color: #1877F2;
+    width: 112px;
+    height: 31px;
+    border-radius: 5px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+export default function TrendingSidebar({ showButton, idFromUserPage, loggedUser }){
+
+    //console.log('showButton ', showButton, idFromUserPage, loggedUser);
 
     const [hashtags, setHashtags] = useState([]);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [loadingButton, setLoadingButton] = useState(false);
+    const {header} = useContext(TokenContext);
 
     function getHashtagsContent(){
 
@@ -76,12 +114,99 @@ export default function TrendingSidebar(){
 
     }, []);
 
+    useEffect(()=>{
+
+        (async ()=>{
+
+            if(!idFromUserPage) return;
+            if(!header) return;
+
+            try {
+                
+                const { data } = await axios.get(`${REACT_APP_API_URL}/users/${idFromUserPage}/is-following`, header);
+                setIsFollowing(data);
+
+            } catch (err) {
+                console.log(err);
+                alert('Ocorreu um erro ao carregar a lista de trendings.');
+            }
+
+
+        })();
+
+    }, [header]);
+
+    async function followUser(){
+
+        try {
+            
+            setLoadingButton(true);
+            await axios.post(`${REACT_APP_API_URL}/users/${idFromUserPage}/follow`, {}, header);
+            setIsFollowing(true);
+            setLoadingButton(false);
+
+        } catch (err) {
+            console.log(err);
+            alert('Não foi possível seguir o usuário. Tente novamente.');
+        }
+
+    }
+
+    async function unfollowUser(){
+
+        try {
+            
+            setLoadingButton(true);
+            await axios.post(`${REACT_APP_API_URL}/users/${idFromUserPage}/unfollow`, {}, header);
+            setIsFollowing(false);
+            setLoadingButton(false);
+
+        } catch (err) {
+            console.log(err);
+            alert('Não foi possível deixar de seguir o usuário. Tente novamente.');
+        }
+
+    }
+
+    function getButton(){
+
+        if(!showButton) return null;
+
+        if(!idFromUserPage || !loggedUser || loadingButton) return (
+            <FollowButton>
+                <ThreeDots color="white" height={40} width={40} />
+            </FollowButton>
+        );
+
+        if((idFromUserPage && loggedUser) && Number(idFromUserPage) === Number(loggedUser.id)) return null;
+
+        console.log('isFollowing ', isFollowing, loadingButton);
+
+        if(isFollowing){
+
+            return (
+                <UnfollowButton onClick={unfollowUser}>Unfollow</UnfollowButton>
+            );            
+
+        } else {
+
+            return (
+                <FollowButton onClick={followUser}>Follow</FollowButton>
+            );
+
+        }
+
+    }
+
     return(
-        <TrendingDiv>
-            <h5><strong>Trending</strong></h5>
-            <hr />
-            {getHashtagsContent()}
-        </TrendingDiv>
+        <RightSideWrapper>
+            {getButton()}
+            <TrendingDiv>
+                <h5><strong>Trending</strong></h5>
+                <hr />
+                {getHashtagsContent()}
+            </TrendingDiv>
+        </RightSideWrapper>
     );
 
 };
