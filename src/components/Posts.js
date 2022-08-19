@@ -8,6 +8,7 @@ import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
 import useInterval from 'use-interval';
+import InfiniteScroll from 'react-infinite-scroller';
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ const PostsDiv = styled.div`
     
 `;
 
-const CenteredDiv = styled.div`
+export const CenteredDiv = styled.div`
     text-align: -webkit-center;
     display: flex;
     justify-content: center;
@@ -61,7 +62,6 @@ const Spacer = styled.div`
 height: 40px;
 ;
 `
-
 function getPosts(loading, posts, loggedUser, following = null){
 
     if(following !== null && following !== undefined){
@@ -123,16 +123,21 @@ function getPosts(loading, posts, loggedUser, following = null){
 
 }
 
+
+
 export default function Posts(){
 
     const [posts, setPosts] = useState([]);
     const [reload, setReload] = useState(1)
     const [newPosts, setNewPosts] = useState(0);
-    const [loading, setLoading] = useState(true);
+    const [offset , setOffset] = useState(0)
+    const [postsCount , setPostsCount] = useState(0)
+    const [hasMore , setHasMore] = useState(true)
     const [loggedUser, setLoggedUser] = useState("");
     const {header} = useContext(TokenContext);
     const { id: userId } = useParams();
     const [following, setFollowing] = useState(0);
+    
 
     useEffect(()=>{
 
@@ -142,13 +147,13 @@ export default function Posts(){
 
                 if(!header) return;
 
-                const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}` : `${REACT_APP_API_URL}/timeline`;
+                const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}/0` : `${REACT_APP_API_URL}/timeline/0`;
                 
                 const { data } =  await axios.get(requestUrl, header);
                 const { posts, followingCount } = data;
                 setPosts(posts);
                 setFollowing(followingCount);
-                setLoading(false);
+                
 
             } catch (err) {
                 console.log(err);
@@ -159,6 +164,52 @@ export default function Posts(){
 
     }, [header, userId, reload]);
 
+
+    useEffect(()=>{
+
+        (async ()=>{
+          
+            try {
+                if(!header) return;
+                const { data } =  await axios.get(`${REACT_APP_API_URL}/countposts`, header);
+                setPostsCount(data)
+
+            } catch (err) {
+                console.log(err);
+                alert('An error occured while trying to fetch the posts, please refresh the page');
+            }
+
+        })();
+
+    });
+    
+   async function fetchposts(){
+        try {
+            if(!header) return;
+            const newOffset = offset + 10
+           
+            const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}/${newOffset}`  : `${REACT_APP_API_URL}/timeline/${newOffset}`;
+            const response =  await axios.get(requestUrl, header)
+           
+            if (response && response.data) {
+                const newposts = [...posts, ...response.data.posts];
+          
+                if (newposts.length >= postsCount) {
+                  setHasMore(false);
+                }
+          
+               setPosts(newposts);
+          
+                setOffset(newOffset);
+              }
+            
+        } catch (err) {
+            console.log(err);
+            alert('An error occured while trying to fetch the posts, please refresh the page');
+        }
+    }
+
+   
 
     useEffect(() => {
         const REACT_APP_API_URL = process.env.REACT_APP_API_URL; 
@@ -176,7 +227,7 @@ export default function Posts(){
         try{
         if(posts && !userId && header){
         
-        const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline`, header)
+        const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline/0`, header)
 
        
         if(data.posts.length > 0 && data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
@@ -199,7 +250,27 @@ export default function Posts(){
        </RefreshButton> : <Spacer/>}
         
         <PostsDiv>
-            {getPosts(loading, posts, loggedUser)}
+
+        {following === 0 ? 
+        <CenteredDiv>
+        <p>You don't follow anyone yet. Search for new friends!</p>
+        </CenteredDiv> 
+        : posts.length === 0?
+        <CenteredDiv>
+        <p>No posts found from your friends</p>
+        </CenteredDiv>
+        : <InfiniteScroll
+        pageStart={0}
+        loadMore={()=>fetchposts()}
+        hasMore={hasMore}
+        loader={
+        <CenteredDiv>
+        <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
+        </CenteredDiv>
+        }
+    >
+        {posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser} key = {post.id}/>)}
+        </InfiniteScroll> }
         </PostsDiv>
         </>
     );
@@ -207,5 +278,5 @@ export default function Posts(){
 };
 
 export {
-    getPosts
+    getPosts,
 };
