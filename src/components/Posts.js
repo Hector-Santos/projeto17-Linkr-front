@@ -62,8 +62,7 @@ const Spacer = styled.div`
 height: 40px;
 ;
 `
-
-function getPosts( posts, loggedUser, following = null){
+function getPosts(loading, posts, loggedUser, following = null){
 
     if(following !== null && following !== undefined){
 
@@ -87,6 +86,12 @@ function getPosts( posts, loggedUser, following = null){
 
     }
 
+    if(loading) return (
+        <CenteredDiv>
+            <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
+        </CenteredDiv>
+    );
+
     if(posts.length === 0){
 
         return (
@@ -97,8 +102,21 @@ function getPosts( posts, loggedUser, following = null){
 
     } else {
 
-        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser} key = {post.id}/>);
-        console.log(postsList)
+        const postsList = posts.map((post, postIndex) => <Post 
+            authorPic={post.author.pictureUrl} 
+            authorId={post.author.id} 
+            authorUsename={post.author.username} 
+            postContent={post.content} 
+            link={post.link} 
+            postId={post.id} 
+            likes={post.likes} 
+            hashtags={post.hashtags} 
+            loggedUser={loggedUser} 
+            key={post.id}
+            shared={(post.originalPostId !== null && post.originalPostId !== undefined)} 
+            sharedFrom={post.repostAuthorUsername}
+            repostAuthorId={post.repostAuthorId}
+            />);
         return postsList;
 
     }
@@ -128,7 +146,7 @@ export default function Posts(){
 
                 if(!header) return;
 
-                const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}` : `${REACT_APP_API_URL}/timeline/`;
+                const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}/0` : `${REACT_APP_API_URL}/timeline/0`;
                 
                 const { data } =  await axios.get(requestUrl, header);
                 const { posts, followingCount } = data;
@@ -151,8 +169,8 @@ export default function Posts(){
         (async ()=>{
           
             try {
-
-                const { data } =  await axios.get(`${REACT_APP_API_URL}/timeline/`, header);
+                if(!header) return;
+                const { data } =  await axios.get(`${REACT_APP_API_URL}/countposts`, header);
                 setPostsCount(data)
 
             } catch (err) {
@@ -164,21 +182,22 @@ export default function Posts(){
 
     });
    
-    const fetchposts = async () =>{
+    async function fetchposts(){
         try {
-            const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}`  : `${REACT_APP_API_URL}/timeline/${offset}`;
-            const newOffset = offset + 10 
-            const response =  await axios.get(requestUrl,{params:{offset:newOffset}}, header)
+            if(!header) return;
+            const newOffset = offset + 10
+            console.log(offset)
+            const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}/${newOffset}`  : `${REACT_APP_API_URL}/timeline/${newOffset}`;
+            const response =  await axios.get(requestUrl, header)
             console.log(response.data.posts)
             if (response && response.data) {
-                const newposts = [...posts, ...response.data.data];
+                const newposts = [...posts, ...response.data.posts];
           
                 if (newposts.length >= postsCount) {
                   setHasMore(false);
                 }
           
                 setPosts(newposts);
-                console.log("Coins: ", posts);
           
                 setOffset(newOffset);
               }
@@ -211,7 +230,7 @@ export default function Posts(){
         try{
         if(posts && !userId && header){
         
-        const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline/`, header)
+        const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline/0`, header)
 
        
         if(data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
@@ -234,20 +253,27 @@ export default function Posts(){
        </RefreshButton> : <Spacer/>}
         
         <PostsDiv>
-        <InfiniteScroll
-    pageStart={0}
-    loadMore={fetchposts}
-    hasMore={true||false}
 
-    loader={
+        {following === 0 ? 
+        <CenteredDiv>
+        <p>You don't follow anyone yet. Search for new friends!</p>
+        </CenteredDiv> 
+        : posts.length === 0?
+        <CenteredDiv>
+        <p>No posts found from your friends</p>
+        </CenteredDiv>
+        : <InfiniteScroll
+        pageStart={0}
+        loadMore={()=>{fetchposts()}}
+        hasMore={hasMore}
+        loader={
         <CenteredDiv>
         <ReactLoading type="spin" color="#fff" height="10%" width="10%" />
-    </CenteredDiv>
-    }
->
-    {getPosts(posts, loggedUser)}
-</InfiniteScroll>
-            
+        </CenteredDiv>
+        }
+    >
+        {posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser} key = {post.id}/>)}
+        </InfiniteScroll> }
         </PostsDiv>
         </>
     );  

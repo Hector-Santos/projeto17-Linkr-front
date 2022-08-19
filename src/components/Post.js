@@ -464,7 +464,6 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
         } catch (err) {
             console.log(err);
-            alert('An error occured while trying to fetch the info of the posts');
         }
 
     }
