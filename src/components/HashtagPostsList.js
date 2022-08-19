@@ -57,6 +57,7 @@ export default function HashtagPostsList(){
         (async ()=>{
           
             try {
+                if(!posts) return;
                 const { data } =  await axios.get(`${REACT_APP_API_URL}/countpostshashtags/${hashtagName}`);
                 
                 setPostsCount(data)
