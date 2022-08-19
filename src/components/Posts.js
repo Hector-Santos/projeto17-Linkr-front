@@ -24,7 +24,7 @@ const PostsDiv = styled.div`
     
 `;
 
-const CenteredDiv = styled.div`
+export const CenteredDiv = styled.div`
     text-align: -webkit-center;
     display: flex;
     justify-content: center;
@@ -132,11 +132,12 @@ export default function Posts(){
     const [newPosts, setNewPosts] = useState(0);
     const [offset , setOffset] = useState(0)
     const [postsCount , setPostsCount] = useState(0)
-    const [hasMore , setHasMore] = useState(false)
+    const [hasMore , setHasMore] = useState(true)
     const [loggedUser, setLoggedUser] = useState("");
     const {header} = useContext(TokenContext);
     const { id: userId } = useParams();
     const [following, setFollowing] = useState(0);
+    
 
     useEffect(()=>{
 
@@ -181,15 +182,15 @@ export default function Posts(){
         })();
 
     });
-   
-    async function fetchposts(){
+    
+   async function fetchposts(){
         try {
             if(!header) return;
             const newOffset = offset + 10
-            console.log(offset)
+           
             const requestUrl = (userId) ? `${REACT_APP_API_URL}/posts/${userId}/${newOffset}`  : `${REACT_APP_API_URL}/timeline/${newOffset}`;
             const response =  await axios.get(requestUrl, header)
-            console.log(response.data.posts)
+           
             if (response && response.data) {
                 const newposts = [...posts, ...response.data.posts];
           
@@ -197,12 +198,10 @@ export default function Posts(){
                   setHasMore(false);
                 }
           
-                setPosts(newposts);
+               setPosts(newposts);
           
                 setOffset(newOffset);
               }
-            
-            
             
         } catch (err) {
             console.log(err);
@@ -210,9 +209,7 @@ export default function Posts(){
         }
     }
 
-    useEffect(() => {
-        fetchposts();
-      });
+   
 
     useEffect(() => {
         const REACT_APP_API_URL = process.env.REACT_APP_API_URL; 
@@ -264,7 +261,7 @@ export default function Posts(){
         </CenteredDiv>
         : <InfiniteScroll
         pageStart={0}
-        loadMore={()=>{fetchposts()}}
+        loadMore={()=>fetchposts()}
         hasMore={hasMore}
         loader={
         <CenteredDiv>

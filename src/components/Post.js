@@ -601,7 +601,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
             }
 
         } catch (err) {
-            console.log(err);
+            //console.log(err);
         }
 
     }

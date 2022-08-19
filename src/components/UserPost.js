@@ -7,6 +7,8 @@ import ReactLoading from 'react-loading';
 import { useParams } from "react-router-dom";
 import { TokenContext } from '../context/TokenContext';
 import Header from "./Header";
+import InfiniteScroll from 'react-infinite-scroller';
+
 
 dotenv.config();
 
