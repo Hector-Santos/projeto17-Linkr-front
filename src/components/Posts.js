@@ -170,7 +170,7 @@ export default function Posts(){
         (async ()=>{
           
             try {
-                if(!header) return;
+                if(!header && !posts ) return;
                 const { data } =  await axios.get(`${REACT_APP_API_URL}/countposts`, header);
                 setPostsCount(data)
 
