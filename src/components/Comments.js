@@ -2,9 +2,17 @@ import styled from "styled-components";
 
 import defaultProfile from '../assets/defaultprofile.png'
 
-export default function Comments({ commentAuthor, commentAuthorPic, content, postAuthor, following }) {
-
-    console.log({ commentAuthor, commentAuthorPic, content, postAuthor, following })
+export default function Comments({ commentAuthor, commentAuthorPic, content, postAuthor, isFollower }) {
+    const renderInfo = () => {
+        if (postAuthor) {
+            return "• post's author";
+        }
+        if (isFollower != 0) {
+            return "• following";
+        }
+        return null;
+    };
+    
     return(
         <CommentContainer>
             <div className="image">
@@ -15,15 +23,8 @@ export default function Comments({ commentAuthor, commentAuthorPic, content, pos
             </div>
             <div>
                 <div className="header">
-                    <h3>{commentAuthor} </h3>
-                    {postAuthor
-                        ? <h2>• post's author</h2>
-                        : ""
-                    }
-                    {following
-                        ? <h2>• following</h2>
-                        : ""
-                    }
+                    <h2>{commentAuthor}</h2>
+                    <h3>{renderInfo()}</h3>
                 </div>
                 <p>{content}</p>
             </div>
@@ -33,7 +34,7 @@ export default function Comments({ commentAuthor, commentAuthorPic, content, pos
 
 const CommentContainer = styled.div`
     border-bottom: 1px solid #353535;
-    padding: 15px 25px;
+    padding: 15px 0;
     display: flex;
     align-items: center;
 
@@ -43,12 +44,12 @@ const CommentContainer = styled.div`
 
     img {
         border-radius: 50%;
-        width: 48px;
-        height: 48px;
+        width: 39px;
+        height: 39px;
         margin-right: 20px;
     }
 
-    h3 {
+    h2 {
         margin-bottom: 5px;
         font-family: 'Lato';
         font-weight: 700;
@@ -57,7 +58,7 @@ const CommentContainer = styled.div`
         color: #F3F3F3;
     }
 
-    h2 {
+    h3 {
         font-family: 'Lato';
         font-weight: 400;
         font-size: 14px;
