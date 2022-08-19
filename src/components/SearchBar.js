@@ -19,18 +19,17 @@ function SearchBar () {
     async function userSearch (name) {
         try {
             const { data } = await axios.get(`${REACT_APP_API_URL}/search/${name}`, header);
-            
             setSearchResults(data);
-            console.log(data);
         } catch (error) {
             console.log(error);
         }
     }
 
-    function SearchResult ({ username, pictureUrl, id, follow }) {        
+    function SearchResult ({ username, pictureUrl, userId, follow }) {
+
         return (
             <ResultsItem>
-                <Link to={`/user/${id}`}>
+                <Link to={`/user/${userId}`}>
                     <img src={pictureUrl} alt={'img'} />
                     <h2>{username}</h2>
                     <h3>{follow != 0 ? "• following" : ""}</h3>
