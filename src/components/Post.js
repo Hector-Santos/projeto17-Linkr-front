@@ -1,17 +1,20 @@
 import styled from "styled-components";
 import PostLink from "./PostLink";
-import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart, AiFillDelete, AiFillEdit, AiOutlineComment } from "react-icons/ai";
+import { IoPaperPlaneOutline } from "react-icons/io5"
 import formatLikes from "../utils/formatLikes";
 import { ReactTagify } from "react-tagify";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { useEffect, useState, useContext, useRef } from "react";
 import axios from "axios";
+import Comments from "./Comments";
 import { TokenContext } from '../context/TokenContext';
 import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 import ReactTooltip from "react-tooltip";
 import defaultProfile from '../assets/defaultprofile.png'
+import { BiRepost } from "react-icons/bi";
 
 
 dotenv.config();
@@ -20,12 +23,20 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 const PostDiv = styled.div`
     max-width: 610px;
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
-    padding: 30px;
+    
     box-sizing: border-box;
-    background-color: #171717;
+    background: #1E1E1E;
     margin: auto auto 40px;
     border-radius: 16px;
+
+    .post-proper {
+        display: flex;
+        background-color: #171717;
+        padding: 30px;
+        border-radius: 16px;
+    }
 
     .left-side > img {
         border-radius: 50%;
@@ -197,18 +208,86 @@ const EditContainer = styled.textarea`
     }
 `;
 
-export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
+const CommentContainer = styled.div`
+    background: #1E1E1E;
+    border-radius: 16px;
+    border-radius: 0 0 16px 16px;
+    margin: 0 5px;
+    padding: 0 20px;
+    
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        margin: 19px 0;
+
+        img {
+            width: 39px;
+            height: 39px;
+            border-radius: 50%;
+            margin-right: 14px;
+        }
+
+        button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #252525;
+            border-radius: 0 8px 8px 0;
+            border: none;
+        }
+    }
+
+    input {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        height: 39px;
+        background: #252525;
+        border-radius: 8px 0 0 8px;
+        border: none;
+        font-size: 14px;
+        line-height: 17px;
+        letter-spacing: 0.05em;
+        padding: 0 15px;
+        color: #FFFFFF;
+        outline: none;
+
+        &::placeholder {
+            font-style: italic;
+            color: #575757;
+        }
+    }
+`;
+
+const SharedWrapper = styled.div`
+    display: flex;
+    justify-content: start;
+    padding: 10px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+`;
+
+export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser, shared, sharedFrom, repostAuthorId }){
 
     const navigate = useNavigate();
     const [liked, setLiked] = useState(false)
     const [thisLikes, setThisLikes] = useState(likes)
     const {token,header} = useContext(TokenContext)
     const [modalOpen, setModalOpen] = useState(false);
+    const [repostModalOpen, setRepostModalOpen] = useState(false);
     const [likesInfo, setLikesInfo] = useState("Ninguém curtiu este post ainda")
     const [enableEdit, setEnableEdit] = useState(false);
     const [loadDelete, setLoadDelete] = useState(false);
     const [loadEdit, setLoadEdit] = useState(false);
     const [newContent, setNewContent] = useState(postContent);
+    const [comments, setComments] = useState([]);
+    const [reposts, setReposts] = useState([]);
+    const [comment, setComment] = useState("");
+    const [showComments, setShowComments] = useState(false);
+    const [profilePic, setProfilePic] = useState();
+
     const element = useRef("");
 
     Modal.setAppElement('*')
@@ -230,10 +309,34 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         }
     }
 
+    useEffect(()=>{
+        ( async ()=>{
+           if(header){
+           const user  = await axios.get(`${REACT_APP_API_URL}/users`,header) 
+           setProfilePic(user.data.pictureUrl)
+           }
+        })()
+    },[profilePic,REACT_APP_API_URL, header]);
+
     function refreshPage() {
         window.location.reload(false);
     }
 
+    async function addComment() {
+        if (comment === "") return;
+        const data = { content: comment };
+
+        try {
+            await axios.post(`${REACT_APP_API_URL}/comments/${postId}`, data, header);
+        } catch (error) {
+            console.log(error);
+            alert("Error: cannot add comment.");
+            refreshPage();
+        }
+        setComment("");
+        refreshPage();
+    }
+    
     async function deletePost(e) {
         e.preventDefault();
         setLoadDelete(true);
@@ -252,7 +355,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
     async function editPost(e) {
         e.preventDefault();
-        const data = { content: newContent};
+        const data = { content: newContent };
         setLoadEdit(true);
         
         try{
@@ -289,6 +392,41 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
 
         navigate(`/hashtag/${hashtagName.replace(/#/gi, "")}`);
 
+    }
+
+    useEffect(() => {
+        ( async () => {
+            if (token) {
+                let promise = axios.get(`${REACT_APP_API_URL}/comments/${postId}`, header)
+                promise.then((response => {
+                    setComments(response.data)
+                }))
+                promise.catch(error => {
+                    console.log(error)
+                })
+            }
+        })()
+    }, [header, postId, token])
+
+    function getComments(comments) {
+               
+        const commentsList = comments.map(comment => 
+            <Comments 
+                commentAuthor={comment.username} 
+                commentAuthorPic={comment.pictureUrl} 
+                content={comment.content} 
+                postAuthor={comment.postAuthor}
+                isFollower={comment.isFollower}
+            />);
+        return commentsList;
+    }
+
+    const toggleComments = () => {
+        if (showComments === false) {
+            setShowComments(true);
+        } else {
+            setShowComments(false);
+        }
     }
     
     useEffect(()=>{
@@ -475,6 +613,47 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         navigate(`/user/${authorId}`) 
     }
 
+    async function repost(){
+
+        try {
+
+            await axios.post(`${REACT_APP_API_URL}/posts/${postId}/repost`, {}, header);
+            setRepostModalOpen(false);
+
+            const newReposts = [...reposts];
+            newReposts.push({
+                originalPostId: postId,
+                repostingUserId: loggedUser.id
+            });
+
+            setReposts(newReposts);
+
+        } catch (err) {
+            console.log(err);
+            alert('An error occured while trying to share this post');
+        }
+
+    }
+
+    useEffect(()=>{
+
+        (async ()=>{
+
+            try {
+
+                const { data: reposts } = await axios.get(`${REACT_APP_API_URL}/posts/${postId}/reposts`, header);
+                setReposts(reposts);
+
+            } catch (err) {
+                console.log(err);
+                alert('An error occured while trying to fetch the reposts of this post');
+            }
+
+
+        })();
+
+    }, [header]);
+
     return(
         <>
             <Modal
@@ -500,42 +679,119 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     </>
                 )}
             </Modal>
+            <Modal
+                isOpen={repostModalOpen}
+                onRequestClose={() => setRepostModalOpen(false)}
+                style={customStyles}
+            >
+                {loadDelete === true ? (
+                    <RotatingLines strokeColor='white' width={200} />
+                ) : (
+                    <>
+                        <ModalText>
+                            Do you want to re-post <br/>
+                            this link?
+                        </ModalText>
+                        <ModalButtons>
+                            <CancelButton onClick={() => setRepostModalOpen(false)}>
+                                No, cancel
+                            </CancelButton>
+                            <DeleteButton onClick={repost}>
+                                Yes, share!
+                            </DeleteButton>
+                        </ModalButtons>
+                    </>
+                )}
+            </Modal>
             <PostDiv>
-            <div className="left-side">
-               {authorPic ? <img src={authorPic} alt="Imagem de perfil do usuário que publicou" /> 
-               : <img src={defaultProfile} alt="defultProfile" /> }
-                <span>
-                    {
-                        liked ? (
-                            <>
-                                <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
-                                <ReactTooltip place="bottom" type="light" effect="float" />
-                            </>
-                        ) : (
-                            <>
-                                <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
-                                <ReactTooltip place="bottom" type="light" effect="float" />
-                            </>
-                        )
-                    }
-                </span>
-                <p>{formatLikes(thisLikes) } Likes</p>
-            </div>
-                <div className="post-info">
-                    <span>
-                        <h3 onClick={redirectToUserPage}>{authorUsename}</h3>
-                        
-                        <EditButtons />
-                    </span>
+                {
+                    shared ? (
+                        <SharedWrapper>
+                            <BiRepost />
+                            <p>Re-posted by {repostAuthorId === loggedUser ? 'you' : sharedFrom}</p>
+                        </SharedWrapper>
+                    ) : null
+                }
+                <div className="post-proper">
+                    <div className="left-side">
+                        {authorPic  
+                            ? <img src={authorPic} alt="Imagem de perfil do usuário que publicou" /> 
+                            : <img src={defaultProfile} alt="defultProfile" /> }
+                        <span>
+                            {
+                                liked ? (
+                                    <>
+                                        <AiFillHeart cursor="pointer" onClick={likePost} data-tip={likesInfo}/>
+                                        <ReactTooltip place="bottom" type="light" effect="float" />
+                                    </>
+                                ) : (
+                                    <>
+                                        <AiOutlineHeart cursor="pointer" onClick={likePost} data-tip={likesInfo}/>
+                                        <ReactTooltip place="bottom" type="light" effect="float" />
+                                    </>
+                                )
+                            }
+                        </span>
+                        <p>{formatLikes(thisLikes) } Likes</p>
 
-                    {formatPostContent()}
+                        <span>
+                            <AiOutlineComment cursor="pointer"
+                                onClick={() => toggleComments(postId, setComments, token)}
+                            />
+                        </span>
+                        {comments.length === 1
+                            ? <p>{comments.length} comment</p>
+                            : <p>{comments.length} comments</p>
+                        }
 
-                    <div className="links">
-                        <PostLink linkUrl={link} postId={postId} />
+                        <span>
+                            <BiRepost cursor="pointer" onClick={() => setRepostModalOpen(true)} />
+                        </span>
+                        {reposts.length === 1
+                            ? <p>{reposts.length} repost</p>
+                            : <p>{reposts.length} reposts</p>
+                        }
+
                     </div>
+                    <div className="post-info">
+                        <span>
+                            <h3 onClick={redirectToUserPage}>{authorUsename}</h3>
+                            
+                            <EditButtons />
+                        </span>
 
+                        {formatPostContent()}
+
+                        <div className="links">
+                            <PostLink linkUrl={link} postId={postId} />
+                        </div>
+
+                    </div>
                 </div>
-
+                {showComments
+                    ? <CommentContainer>
+                        {getComments(comments, loggedUser)}
+                        <form onSubmit={addComment}>
+                            <img src={profilePic} />
+                            <input 
+                                type="text" 
+                                placeholder="write a comment..." 
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                            />
+                            <button type="submit">
+                                <IoPaperPlaneOutline
+                                    style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        color: "#FFFFFF"
+                                    }}
+                                />
+                            </button>
+                        </form>
+                    </CommentContainer>
+                    : <></>
+                }
             </PostDiv>
         </>
 

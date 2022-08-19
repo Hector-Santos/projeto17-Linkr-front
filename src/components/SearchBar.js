@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { DebounceInput } from "react-debounce-input";
 import axios from "axios";
@@ -6,30 +6,33 @@ import dotenv from 'dotenv';
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
+import { TokenContext } from '../context/TokenContext';
+
 dotenv.config();
 
 function SearchBar () {
+    const { header } = useContext(TokenContext)
     const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
     const [searchResults, setSearchResults] = useState([]);
 
     async function userSearch (name) {
         try {
-            const { data } = await axios.get(`${REACT_APP_API_URL}/search/${name}`);
-            
+            const { data } = await axios.get(`${REACT_APP_API_URL}/search/${name}`, header);
             setSearchResults(data);
-            console.log(data);
         } catch (error) {
             console.log(error);
         }
     }
 
-    function SearchResult ({ username, pictureUrl, userId }) {
+    function SearchResult ({ username, pictureUrl, userId, follow }) {
+
         return (
             <ResultsItem>
                 <Link to={`/user/${userId}`}>
                     <img src={pictureUrl} alt={'img'} />
                     <h2>{username}</h2>
+                    <h3>{follow != 0 ? "• following" : ""}</h3>
                 </Link>
             </ResultsItem>
         )
@@ -61,6 +64,7 @@ function SearchBar () {
                             pictureUrl={user.pictureUrl}
                             username={user.username}
                             userId={user.id}
+                            follow={user.follow}
                             key={i} />
                     })
                 ) : ""}
@@ -152,6 +156,14 @@ const ResultsItem = styled.div`
         font-size: 19px;
         line-height: 23px;
         color: #515151;
+    }
+
+    a h3 {
+        font-family: 'Lato';
+        font-weight: 400;
+        font-size: 19px;
+        line-height: 23px;
+        color: #C5C5C5;
     }
 `;
 

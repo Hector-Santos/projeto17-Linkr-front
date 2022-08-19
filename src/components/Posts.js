@@ -233,7 +233,7 @@ export default function Posts(){
         const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline/0`, header)
 
        
-        if(data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
+        if(data.posts.length > 0 && data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
         }
      } catch (err) {
         console.log(err);
@@ -276,7 +276,7 @@ export default function Posts(){
         </InfiniteScroll> }
         </PostsDiv>
         </>
-    );  
+    );
 
 };
 
