@@ -102,7 +102,21 @@ function getPosts(loading, posts, loggedUser, following = null){
 
     } else {
 
-        const postsList = posts.map(post => <Post authorPic={post.author.pictureUrl} authorId={post.author.id} authorUsename={post.author.username} postContent={post.content} link={post.link} postId={post.id} likes={post.likes} hashtags={post.hashtags} loggedUser={loggedUser} key = {post.id}/>);
+        const postsList = posts.map((post, postIndex) => <Post 
+            authorPic={post.author.pictureUrl} 
+            authorId={post.author.id} 
+            authorUsename={post.author.username} 
+            postContent={post.content} 
+            link={post.link} 
+            postId={post.id} 
+            likes={post.likes} 
+            hashtags={post.hashtags} 
+            loggedUser={loggedUser} 
+            key={post.id}
+            shared={(post.originalPostId !== null && post.originalPostId !== undefined)} 
+            sharedFrom={post.repostAuthorUsername}
+            repostAuthorId={post.repostAuthorId}
+            />);
         return postsList;
 
     }
@@ -165,7 +179,7 @@ export default function Posts(){
         const { data} =  await axios.get(`${REACT_APP_API_URL}/timeline`, header)
 
        
-        if(data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
+        if(data.posts.length > 0 && data.posts[0].id >= posts[0].id) setNewPosts(data.posts[0].id - posts[0].id)
         }
      } catch (err) {
         console.log(err);

@@ -14,6 +14,7 @@ import dotenv from 'dotenv';
 import { RotatingLines } from "react-loader-spinner";
 import ReactTooltip from "react-tooltip";
 import defaultProfile from '../assets/defaultprofile.png'
+import { BiRepost } from "react-icons/bi";
 
 
 dotenv.config();
@@ -209,6 +210,7 @@ const EditContainer = styled.textarea`
 
 const CommentContainer = styled.div`
     background: #1E1E1E;
+    border-radius: 16px;
     border-radius: 0 0 16px 16px;
     margin: 0 5px;
     padding: 0 20px;
@@ -257,22 +259,31 @@ const CommentContainer = styled.div`
             color: #575757;
         }
     }
+`;
 
-`
+const SharedWrapper = styled.div`
+    display: flex;
+    justify-content: start;
+    padding: 10px;
+    font-family: 'Lato', sans-serif;
+    font-size: 12px;
+`;
 
-export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser}){
+export default function Post({ authorPic, authorId, authorUsename, postContent, link, likes, hashtags, postId, loggedUser, shared, sharedFrom, repostAuthorId }){
 
     const navigate = useNavigate();
     const [liked, setLiked] = useState(false)
     const [thisLikes, setThisLikes] = useState(likes)
     const {token,header} = useContext(TokenContext)
     const [modalOpen, setModalOpen] = useState(false);
+    const [repostModalOpen, setRepostModalOpen] = useState(false);
     const [likesInfo, setLikesInfo] = useState("Ninguém curtiu este post ainda")
     const [enableEdit, setEnableEdit] = useState(false);
     const [loadDelete, setLoadDelete] = useState(false);
     const [loadEdit, setLoadEdit] = useState(false);
     const [newContent, setNewContent] = useState(postContent);
     const [comments, setComments] = useState([]);
+    const [reposts, setReposts] = useState([]);
     const [comment, setComment] = useState("");
     const [showComments, setShowComments] = useState(false);
     const [profilePic, setProfilePic] = useState();
@@ -603,6 +614,47 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         navigate(`/user/${authorId}`) 
     }
 
+    async function repost(){
+
+        try {
+
+            await axios.post(`${REACT_APP_API_URL}/posts/${postId}/repost`, {}, header);
+            setRepostModalOpen(false);
+
+            const newReposts = [...reposts];
+            newReposts.push({
+                originalPostId: postId,
+                repostingUserId: loggedUser.id
+            });
+
+            setReposts(newReposts);
+
+        } catch (err) {
+            console.log(err);
+            alert('An error occured while trying to share this post');
+        }
+
+    }
+
+    useEffect(()=>{
+
+        (async ()=>{
+
+            try {
+
+                const { data: reposts } = await axios.get(`${REACT_APP_API_URL}/posts/${postId}/reposts`, header);
+                setReposts(reposts);
+
+            } catch (err) {
+                console.log(err);
+                alert('An error occured while trying to fetch the reposts of this post');
+            }
+
+
+        })();
+
+    }, [header]);
+
     return(
         <>
             <Modal
@@ -628,7 +680,39 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                     </>
                 )}
             </Modal>
+            <Modal
+                isOpen={repostModalOpen}
+                onRequestClose={() => setRepostModalOpen(false)}
+                style={customStyles}
+            >
+                {loadDelete === true ? (
+                    <RotatingLines strokeColor='white' width={200} />
+                ) : (
+                    <>
+                        <ModalText>
+                            Do you want to re-post <br/>
+                            this link?
+                        </ModalText>
+                        <ModalButtons>
+                            <CancelButton onClick={() => setRepostModalOpen(false)}>
+                                No, cancel
+                            </CancelButton>
+                            <DeleteButton onClick={repost}>
+                                Yes, share!
+                            </DeleteButton>
+                        </ModalButtons>
+                    </>
+                )}
+            </Modal>
             <PostDiv>
+                {
+                    shared ? (
+                        <SharedWrapper>
+                            <BiRepost />
+                            <p>Re-posted by {repostAuthorId === loggedUser ? 'you' : sharedFrom}</p>
+                        </SharedWrapper>
+                    ) : null
+                }
                 <div className="post-proper">
                     <div className="left-side">
                         {authorPic  
@@ -638,12 +722,12 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                             {
                                 liked ? (
                                     <>
-                                        <AiFillHeart onClick={likePost} data-tip={likesInfo}/>
+                                        <AiFillHeart cursor="pointer" onClick={likePost} data-tip={likesInfo}/>
                                         <ReactTooltip place="bottom" type="light" effect="float" />
                                     </>
                                 ) : (
                                     <>
-                                        <AiOutlineHeart onClick={likePost} data-tip={likesInfo}/>
+                                        <AiOutlineHeart cursor="pointer" onClick={likePost} data-tip={likesInfo}/>
                                         <ReactTooltip place="bottom" type="light" effect="float" />
                                     </>
                                 )
@@ -660,6 +744,15 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                             ? <p>{comments.length} comment</p>
                             : <p>{comments.length} comments</p>
                         }
+
+                        <span>
+                            <BiRepost cursor="pointer" onClick={() => setRepostModalOpen(true)} />
+                        </span>
+                        {reposts.length === 1
+                            ? <p>{reposts.length} repost</p>
+                            : <p>{reposts.length} reposts</p>
+                        }
+
                     </div>
                     <div className="post-info">
                         <span>
