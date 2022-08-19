@@ -397,7 +397,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
         })()
     }, [header, postId, token])
 
-    function getComments(comments, loggedUser) {
+    function getComments(comments) {
                
         const commentsList = comments.map(comment => 
             <Comments 
@@ -405,7 +405,7 @@ export default function Post({ authorPic, authorId, authorUsename, postContent, 
                 commentAuthorPic={comment.pictureUrl} 
                 content={comment.content} 
                 postAuthor={comment.postAuthor}
-                currentUser={loggedUser}
+                isFollower={comment.isFollower}
             />);
         return commentsList;
     }
