@@ -202,7 +202,7 @@ export default function Posts(){
             {getPosts(loading, posts, loggedUser)}
         </PostsDiv>
         </>
-    );  
+    );
 
 };
 
